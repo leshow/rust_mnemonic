@@ -1,0 +1,12 @@
+[package]
+
+name = "rust_mnemonic"
+version = "0.1.0"
+authors = [ "Evan Cameron <cameron.evan@gmail.com>" ]
+
+[[bin]]
+
+name = "rust_mnemonic"
+
+[dependencies]
+rust-crypto="*"
