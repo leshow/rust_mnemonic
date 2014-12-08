@@ -19,32 +19,33 @@ pub struct Mnemonic {
 
 
 fn main() {
-  let mut sh = Md5::new();
-  sh.input_str("The quick brown fox jumps over the lazy dog");
-  let out_str = sh.result_str();
-  //println!("{}",out_str);
+    let fox = "The quick brown fox jumps over the lazy dog";
+    println!("md5:  {}",gen_md5(fox));
+    println!("sha256:  {}",gen_sha256(fox));
+    // let password = "The quick brown fox jumps over the lazy dog";
+    // let mac = Hmac::new(Sha256::new(), password.as_bytes());
+    // let stuff = String::from_utf8(mac.to_vec());
+    // println!("{}",stuff);
 
-  // let mut rng = rand::task_rng();
-  // if rng.gen() {
-  //     println!("int: {}, uint: {}", rng.gen::<int>(), rng.gen::<uint>())
-  // }
-
-  // let password = "The quick brown fox jumps over the lazy dog";
-  // let mac = Hmac::new(Sha256::new(), password.as_bytes());
-  // let stuff = String::from_utf8(mac.to_vec());
-  // println!("{}",stuff);
-
-  let mut rng = match OsRng::new() {
+    let mut rng = match OsRng::new() {
       Ok(g) => g,
       Err(e) => panic!("Failed to obtain OS RNG: {}", e)
-  };
+    };
 
-  let num:u32 = rng.next_u32();
-  println!("{}",num);
+    let num:u32 = rng.next_u32();
+    println!("{}",num);
+}
 
+fn gen_md5(hashme:&str) -> String {
+    let mut sh = Md5::new();
+    sh.input_str(hashme);
 
-  let mut sh = Sha256::new();
-  sh.input_str("");
-  let out_str = sh.result_str();
-  //println!("{}",out_str);
+    sh.result_str()
+}
+
+fn gen_sha256(hashme:&str) -> String {
+    let mut sh = Sha256::new();
+    sh.input_str(hashme);
+
+    sh.result_str()
 }
