@@ -44,7 +44,7 @@ fn main() {
     };
     match file.read_to_string() {
         Err(why) => panic!("couldn't read {}: {}", display, why.desc),
-        Ok(string) => print!("{} contains:\n{}", display, string),
+        Ok(string) => print!("{} contains: {}", display, string.words().count()),
     }
 }
 
