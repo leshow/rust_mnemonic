@@ -61,14 +61,3 @@ fn gen_sha256(hashme:&str) -> String {
 
     sh.result_str()
 }
-fn filename_to_string(s: &str) -> IoResult<String> {
-    let path = Path::new(s);
-    let mut file = File::open(&path);
-    file.read_to_string()
-}
-
-fn words_by_line<'a>(s: &'a str) -> Vec<Vec<&'a str>> { // '
-s.lines().map(|line| {
-    line.words().collect()
-    }).collect()
-}
