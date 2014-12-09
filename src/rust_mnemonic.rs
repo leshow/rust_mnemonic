@@ -3,6 +3,7 @@ extern crate "rust-crypto" as rust_crypto;
 use std::io::IoResult;
 use std::num::{Int, ToPrimitive};
 use std::rand::{OsRng, Rng};
+use std::io::File;
 
 
 use rust_crypto::pbkdf2::pbkdf2;
@@ -34,6 +35,17 @@ fn main() {
 
     let num:u32 = rng.next_u32();
     println!("{}",num);
+
+    let path = Path::new("src/wordslist/english.txt");
+    let display = path.display();
+    let mut file = match File::open(&path) {
+        Err(why) => panic!("couldn't open {}: {}", display, why.desc),
+        Ok(file) => file,
+    };
+    match file.read_to_string() {
+        Err(why) => panic!("couldn't read {}: {}", display, why.desc),
+        Ok(string) => print!("{} contains:\n{}", display, string),
+    }
 }
 
 fn gen_md5(hashme:&str) -> String {
@@ -48,4 +60,15 @@ fn gen_sha256(hashme:&str) -> String {
     sh.input_str(hashme);
 
     sh.result_str()
+}
+fn filename_to_string(s: &str) -> IoResult<String> {
+    let path = Path::new(s);
+    let mut file = File::open(&path);
+    file.read_to_string()
+}
+
+fn words_by_line<'a>(s: &'a str) -> Vec<Vec<&'a str>> { // '
+s.lines().map(|line| {
+    line.words().collect()
+    }).collect()
 }
