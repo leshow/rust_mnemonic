@@ -1,14 +1,11 @@
 extern crate "rust-crypto" as rust_crypto;
 extern crate getopts;
 
-use getopts::{reqopt,optflag,getopts,OptGroup,HasArg,Occur};
-use std::os;
+use getopts::{reqopt,optflag,getopts,OptGroup};
 
-use std::io::IoResult;
-use std::num::{Int, ToPrimitive};
+use std::os;
 use std::rand::{OsRng, Rng};
 use std::io::File;
-
 
 use rust_crypto::pbkdf2::pbkdf2;
 use rust_crypto::sha2::Sha256;
