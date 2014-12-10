@@ -6,6 +6,7 @@ use getopts::{reqopt,optflag,getopts,OptGroup};
 use std::os;
 use std::rand::{OsRng, Rng};
 use std::io::File;
+use std::str;
 
 use rust_crypto::pbkdf2::pbkdf2;
 use rust_crypto::sha2::Sha256;
@@ -14,8 +15,7 @@ use rust_crypto::md5::Md5;
 use rust_crypto::mac::Mac;
 use rust_crypto::hmac::Hmac;
 
-
-pub struct Mnemonic {
+struct Mnemonic {
     words: Vec<u8>
 }
 
@@ -27,7 +27,7 @@ fn print_usage(program: &str, _opts: &[OptGroup]) {
 }
 
 fn main() {
-
+    /* start handling opts */
     let args: Vec<String> = os::args();
 
     let program = args[0].clone();
@@ -48,15 +48,12 @@ fn main() {
         Some(x) => x,
         None => panic!("No seed given"),
     };
+    /* end opts, seed value below */
     let str_seed:&str = seed.as_slice();
 
-    println!("{}",str_seed);
-    println!("md5: {}",gen_md5(str_seed));
-    println!("sha256: {}",gen_sha256(str_seed));
-    // let password = "The quick brown fox jumps over the lazy dog";
-    // let mac = Hmac::new(Sha256::new(), password.as_bytes());
-    // let stuff = String::from_utf8(mac.to_vec());
-    // println!("{}",stuff);
+    println!("{}", str_seed);
+    println!("md5: {}", gen_md5(str_seed));
+    println!("sha256: {}", gen_sha256(str_seed));
 
     let mut rng = match OsRng::new() {
       Ok(g) => g,
@@ -81,6 +78,12 @@ fn main() {
     // }
 
     println!("{}",words.words().count());
+    //generate corner cases
+    for &i in [16u,24u,32u].iter() {
+        for n in ["00","7f","80","ff"].iter() {
+            println!("{}",n.repeat(i))
+        }
+    }
 
 }
 
