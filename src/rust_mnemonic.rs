@@ -50,12 +50,11 @@ fn main() {
         Some(x) => x,
         None => panic!("No seed given"),
     };
+    let str_seed:&str = seed.as_slice();
 
-    println!("{}",seed);
-
-    let fox = "The quick brown fox jumps over the lazy dog";
-    println!("md5:  {}",gen_md5(fox));
-    println!("sha256:  {}",gen_sha256(fox));
+    println!("{}",str_seed);
+    println!("md5: {}",gen_md5(str_seed));
+    println!("sha256: {}",gen_sha256(str_seed));
     // let password = "The quick brown fox jumps over the lazy dog";
     // let mac = Hmac::new(Sha256::new(), password.as_bytes());
     // let stuff = String::from_utf8(mac.to_vec());
