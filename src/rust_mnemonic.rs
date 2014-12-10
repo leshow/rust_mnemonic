@@ -18,6 +18,7 @@ use rust_crypto::hmac::Hmac;
 pub struct Mnemonic {
     words: Vec<u8>
 }
+
 //getopts help message
 fn print_usage(program: &str, _opts: &[OptGroup]) {
     println!("Usage: {} [options]", program);
