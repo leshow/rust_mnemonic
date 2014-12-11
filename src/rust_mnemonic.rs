@@ -84,6 +84,9 @@ fn main() {
             println!("{}",n.repeat(i))
         }
     }
+    // for gen_seed in range(0,12u) {
+    //
+    // }
 
 }
 
