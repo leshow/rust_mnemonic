@@ -7,6 +7,7 @@ use std::os;
 use std::rand::{OsRng, Rng};
 use std::io::File;
 use std::str;
+use std::rand::AsciiGenerator;
 
 use rust_crypto::pbkdf2::pbkdf2;
 use rust_crypto::sha2::Sha256;
@@ -59,9 +60,10 @@ fn main() {
       Ok(g) => g,
       Err(e) => panic!("Failed to obtain OS RNG: {}", e)
     };
-
-    let num:u32 = rng.next_u32();
-    println!("{}",num);
+    let mut ascii_gen = match AsciiGenerator::new() {
+        Ok(g) => g,
+        Err(e) => panic!("Failed to obtain OS RNG: {}", e)
+    };
 
     let path = Path::new("src/wordslist/english.txt");
     let display = path.display();
@@ -79,14 +81,16 @@ fn main() {
 
     println!("{}",words.words().count());
     //generate corner cases
-    for &i in [16u,24u,32u].iter() {
+    for &i in [16u,24,32].iter() {
         for n in ["00","7f","80","ff"].iter() {
             println!("{}",n.repeat(i))
         }
     }
-    // for gen_seed in range(0,12u) {
-    //
-    // }
+    for gen_seed in range(0u,12) {
+        // let num:u32 = rng.gen_range(0u,256);
+        // let random_char = Ascii::to_char(num);
+        // println!("{}",random_char);
+    }
 
 }
 
