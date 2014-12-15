@@ -1,14 +1,18 @@
 extern crate "rust-crypto" as rust_crypto;
 extern crate getopts;
 extern crate serialize;
+extern crate core;
 
 use getopts::{reqopt,optflag,getopts,OptGroup};
 
 use std::os;
+use std::num;
 use std::rand::{task_rng, OsRng, Rng};
 use std::io::File;
 use std::str;
 use serialize::hex::{ToHex, FromHex};
+
+use core::fmt::{Binary};
 
 use rust_crypto::pbkdf2::pbkdf2;
 use rust_crypto::sha2::Sha256;
@@ -101,7 +105,7 @@ fn main() {
         //let random_char:String = task_rng().gen_ascii_chars().take(10).collect();
         for &take_num in [16u,24,32].iter() {
             let random_chars:String = task_rng().gen_ascii_chars().take(take_num).collect();
-            //println!("{}",random_chars);
+            println!("{}",random_chars);
             let hex = to_mnemonic(random_chars);
             println!("{}",hex);
         }
@@ -125,6 +129,7 @@ fn gen_sha256(hashme:&str) -> String {
 
 fn to_mnemonic(chars:String) -> String {
     let hash = gen_sha256(chars.as_slice());
+    //println!("{:b}",hash.as_bytes());
 
-    hash.to_hex()
+    hash.as_bytes().to_hex()
 }
