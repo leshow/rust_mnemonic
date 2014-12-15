@@ -1,13 +1,14 @@
 extern crate "rust-crypto" as rust_crypto;
 extern crate getopts;
+extern crate serialize;
 
 use getopts::{reqopt,optflag,getopts,OptGroup};
 
 use std::os;
-use std::rand::{OsRng, Rng};
+use std::rand::{task_rng, OsRng, Rng};
 use std::io::File;
 use std::str;
-use std::rand::AsciiGenerator;
+use serialize::hex::{ToHex, FromHex};
 
 use rust_crypto::pbkdf2::pbkdf2;
 use rust_crypto::sha2::Sha256;
@@ -60,10 +61,6 @@ fn main() {
       Ok(g) => g,
       Err(e) => panic!("Failed to obtain OS RNG: {}", e)
     };
-    let mut ascii_gen = match AsciiGenerator::new() {
-        Ok(g) => g,
-        Err(e) => panic!("Failed to obtain OS RNG: {}", e)
-    };
 
     let path = Path::new("src/wordslist/english.txt");
     let display = path.display();
@@ -86,10 +83,28 @@ fn main() {
             println!("{}",n.repeat(i))
         }
     }
+
+    //generate random seeds
     for gen_seed in range(0u,12) {
-        // let num:u32 = rng.gen_range(0u,256);
-        // let random_char = Ascii::to_char(num);
-        // println!("{}",random_char);
+        //let num:u32 = rng.gen_range(0,256);
+        // for take_num in [16u,24,32].iter() {
+        //     let random_char = match std::char::from_u32(num) {
+        //         Some(c) => c,
+        //         None => panic!("Couldn't convert to char"),
+        //     };
+        //     println!("{}",random_char);
+        // }
+        //
+
+        //task_rng().genIter::<u32>().take(16).
+        //gen A-Z,a-z,0-9
+        //let random_char:String = task_rng().gen_ascii_chars().take(10).collect();
+        for &take_num in [16u,24,32].iter() {
+            let random_chars:String = task_rng().gen_ascii_chars().take(take_num).collect();
+            //println!("{}",random_chars);
+            let hex = to_mnemonic(random_chars);
+            println!("{}",hex);
+        }
     }
 
 }
@@ -106,4 +121,10 @@ fn gen_sha256(hashme:&str) -> String {
     sh.input_str(hashme);
 
     sh.result_str()
+}
+
+fn to_mnemonic(chars:String) -> String {
+    let hash = gen_sha256(chars.as_slice());
+
+    hash.to_hex()
 }
