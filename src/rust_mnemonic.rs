@@ -90,24 +90,10 @@ fn main() {
 
     //generate random seeds
     for gen_seed in range(0u,12) {
-        //let num:u32 = rng.gen_range(0,256);
-        // for take_num in [16u,24,32].iter() {
-        //     let random_char = match std::char::from_u32(num) {
-        //         Some(c) => c,
-        //         None => panic!("Couldn't convert to char"),
-        //     };
-        //     println!("{}",random_char);
-        // }
-        //
-
-        //task_rng().genIter::<u32>().take(16).
-        //gen A-Z,a-z,0-9
-        //let random_char:String = task_rng().gen_ascii_chars().take(10).collect();
-        for &take_num in [16u,24,32].iter() {
-            let random_chars:String = task_rng().gen_ascii_chars().take(take_num).collect();
+        for take_num in range(8 * (gen_seed % 3 + 2)) {
+            let random_chars: Vec<u8> = task_rng().gen_iter::<u8>().take(take_num).collect(); //http://rustbyexample.com/staging/rand.html
             println!("{}",random_chars);
-            let hex = to_mnemonic(random_chars);
-            println!("{}",hex);
+            to_mnemonic(random_chars);
         }
     }
 
@@ -127,9 +113,9 @@ fn gen_sha256(hashme:&str) -> String {
     sh.result_str()
 }
 
-fn to_mnemonic(chars:String) -> String {
-    let hash = gen_sha256(chars.as_slice());
-    //println!("{:b}",hash.as_bytes());
-
-    hash.as_bytes().to_hex()
+fn to_mnemonic(chars:Vec<u8>) -> String {
+    let h:String = gen_sha256(chars.as_slice());
+    println!("{}",h);
+    let b = chars.as_bytes().to_hex();
+    //h.as_bytes().to_hex()
 }
