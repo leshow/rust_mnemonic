@@ -1,4 +1,4 @@
-extern crate "rust-crypto" as rust_crypto;
+extern crate crypto;
 extern crate getopts;
 extern crate serialize;
 extern crate core;
@@ -14,12 +14,12 @@ use serialize::hex::{ToHex, FromHex};
 
 use core::fmt::{Binary};
 
-use rust_crypto::pbkdf2::pbkdf2;
-use rust_crypto::sha2::Sha256;
-use rust_crypto::digest::Digest;
-use rust_crypto::md5::Md5;
-use rust_crypto::mac::Mac;
-use rust_crypto::hmac::Hmac;
+use crypto::pbkdf2::pbkdf2;
+use crypto::sha2::Sha256;
+use crypto::digest::Digest;
+use crypto::md5::Md5;
+use crypto::mac::Mac;
+use crypto::hmac::Hmac;
 
 struct Mnemonic {
     words: Vec<u8>
@@ -90,7 +90,7 @@ fn main() {
 
     //generate random seeds
     for gen_seed in range(0u,12) {
-        for take_num in range(8 * (gen_seed % 3 + 2)) {
+        for take_num in range(0u,8 * (gen_seed % 3 + 2)) {
             let random_chars: Vec<u8> = task_rng().gen_iter::<u8>().take(take_num).collect(); //http://rustbyexample.com/staging/rand.html
             println!("{}",random_chars);
             to_mnemonic(random_chars);
@@ -114,7 +114,12 @@ fn gen_sha256(hashme:&str) -> String {
 }
 
 fn to_mnemonic(chars:Vec<u8>) -> String {
-    let h:String = gen_sha256(chars.as_slice());
+    //let h:String = gen_sha256(chars.as_slice());
+    let mut sh = Sha256::new();
+    let s:String = chars as String;
+    sh.input_str(s.as_slice());
+
+    let h = sh.result_str();
     println!("{}",h);
     let b = chars.as_bytes().to_hex();
     //h.as_bytes().to_hex()
