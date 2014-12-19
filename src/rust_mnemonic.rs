@@ -120,13 +120,15 @@ fn to_mnemonic(chars:String) {
     println!("binary of random chars: {}",s_two);
     //get binary str of sha256 hash
     let mut h_two = String::new();
+    let mut vec_two = Vec::new();
     for &h_byte in h.as_bytes().iter() {
         for char_byte_h in format!("0{:b}",h_byte).chars() {
             h_two.push(char_byte_h)
         }
-        //vec_two.push(format!("0{:b}",h_byte)) //if h_two is a Vec, then this works -- vector of strings with bits
+        vec_two.push(format!("0{:b}",h_byte)) //if h_two is a Vec, then this works -- vector of strings with bits
     }
     let length = s_two.len() / 32;
     println!("{}",length);
-    println!("binary of hash: {}",h_two.slice_to( length ));
+    println!("{}",vec_two.as_slice());
+    println!("binary of hash: {}",h_two);//h_two.slice_to( length )
 }
