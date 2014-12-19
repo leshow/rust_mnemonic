@@ -6,7 +6,6 @@ extern crate core;
 use getopts::{reqopt,optflag,getopts,OptGroup};
 
 use std::os;
-use std::num;
 use std::rand::{task_rng, OsRng, Rng};
 use std::io::File;
 use std::str;
@@ -17,13 +16,6 @@ use core::fmt::{Binary};
 use crypto::pbkdf2::pbkdf2;
 use crypto::sha2::Sha256;
 use crypto::digest::Digest;
-use crypto::md5::Md5;
-use crypto::mac::Mac;
-use crypto::hmac::Hmac;
-
-struct Mnemonic {
-    words: Vec<u8>
-}
 
 //getopts help message
 fn print_usage(program: &str, _opts: &[OptGroup]) {
@@ -58,7 +50,6 @@ fn main() {
     let str_seed:&str = seed.as_slice();
 
     println!("{}", str_seed);
-    println!("md5: {}", gen_md5(str_seed));
     println!("sha256: {}", gen_sha256(str_seed));
 
     let mut rng = match OsRng::new() {
@@ -91,19 +82,19 @@ fn main() {
     //generate random seeds
     for gen_seed in range(0u,12) {
         for take_num in range(0u,8 * (gen_seed % 3 + 2)) {
-            let random_chars: Vec<u8> = task_rng().gen_iter::<u8>().take(take_num).collect(); //http://rustbyexample.com/staging/rand.html
+            //let random_chars: Vec<u8> = task_rng().gen_iter::<u8>().take(take_num).collect(); //http://rustbyexample.com/staging/rand.html
+            let random_chars:String = rng.gen_ascii_chars().take(take_num).collect();
+            //let random_chars:Vec<char> = task_rng().gen_iter::<char>().take(take_num).collect(); //generates any valid character
             println!("{}",random_chars);
             to_mnemonic(random_chars);
+            // let thing = match str::from_utf8(random_chars.as_slice()) {
+            //     None => panic!("can't convert"),
+            //     Some(x) => x,
+            // };
+            //println!("{}",thing);
         }
     }
 
-}
-
-fn gen_md5(hashme:&str) -> String {
-    let mut sh = Md5::new();
-    sh.input_str(hashme);
-
-    sh.result_str()
 }
 
 fn gen_sha256(hashme:&str) -> String {
@@ -113,14 +104,14 @@ fn gen_sha256(hashme:&str) -> String {
     sh.result_str()
 }
 
-fn to_mnemonic(chars:Vec<u8>) -> String {
-    //let h:String = gen_sha256(chars.as_slice());
-    let mut sh = Sha256::new();
-    let s:String = chars as String;
-    sh.input_str(s.as_slice());
-
-    let h = sh.result_str();
+fn to_mnemonic(chars:String) {
+    let h:String = gen_sha256(chars.as_slice());
     println!("{}",h);
-    let b = chars.as_bytes().to_hex();
+
+    let mut b = Vec::new();
+    b.push_all(h.as_bytes());
+    println!("{}",b);
+
+    //let b = chars.as_bytes().to_hex();
     //h.as_bytes().to_hex()
 }
