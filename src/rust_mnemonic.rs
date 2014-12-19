@@ -96,6 +96,9 @@ fn main() {
     }
 
 }
+// this converts a String to Vec<u8>
+// let mut b = Vec::new();
+// b.push_all(h.as_bytes());
 
 fn gen_sha256(hashme:&str) -> String {
     let mut sh = Sha256::new();
@@ -107,11 +110,21 @@ fn gen_sha256(hashme:&str) -> String {
 fn to_mnemonic(chars:String) {
     let h:String = gen_sha256(chars.as_slice());
     println!("{}",h);
-
-    let mut b = Vec::new();
-    b.push_all(h.as_bytes());
-    println!("{}",b);
-
-    //let b = chars.as_bytes().to_hex();
-    //h.as_bytes().to_hex()
+    //get binary string of random seed
+    let mut s_two = String::new();
+    for &s_byte in chars.as_bytes().iter() {
+        for char_byte in format!("0{:b}",s_byte).chars() {
+            s_two.push(char_byte)
+        }
+    }
+    println!("binary of random chars: {}",s_two);
+    //get binary str of sha256 hash
+    let mut h_two = String::new();
+    for &h_byte in h.as_bytes().iter() {
+        for char_byte in format!("0{:b}",h_byte).chars() {
+            h_two.push(char_byte)
+        }
+        //h_two.push(format!("0{:b}",h_byte)) //if b_two is a Vec, then this works -- vector of strings with bits
+    }
+    println!("binary of hash: {}",h_two);
 }
