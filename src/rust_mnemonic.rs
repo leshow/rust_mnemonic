@@ -113,10 +113,11 @@ fn to_mnemonic(chars:String) {
     //get binary string of random seed
     let mut s_two = String::new();
     for &s_byte in chars.as_bytes().iter() {
-        //need to pad binary number with correct amount of zeroes
-        for char_byte in format!("{:b}",s_byte).chars() {
-            s_two.push(char_byte)
-        }
+        let byte_slice = String::from_str(format!("{:b}",s_byte).as_slice());
+        let mut empty = String::from_str("00000000");
+        empty.push_str(byte_slice.as_slice());
+        let slice:String = String::from_str(empty.slice_from(empty.len()-8));
+        s_two.push_str(slice.as_slice());
     }
     println!("binary of random chars: {}",s_two);
     //get binary str of sha256 hash
@@ -124,15 +125,15 @@ fn to_mnemonic(chars:String) {
     //let mut vec_two = Vec::new();
     //unwrap can get a result from Result<Vec<u8>> to Vec<u8> for example
     for &h_byte in h.from_hex().unwrap().iter() {
-        for char_byte_h in format!("{:b}",h_byte).chars() {
-            //let fill_amount = 8 - char_byte_h.len(); need to pad binary number with correct amount of zeroes
-
-            h_two.push(char_byte_h)
-        }
-        //vec_two.push(format!("0{:b}",h_byte)) //if h_two is a Vec, then this works -- vector of strings with bits
+        let byte_slice = String::from_str(format!("{:b}",h_byte).as_slice());
+        let mut empty = String::from_str("00000000");
+        empty.push_str(byte_slice.as_slice());
+        let slice:String = String::from_str(empty.slice_from(empty.len()-8));
+        h_two.push_str(slice.as_slice());
+        //vec_two.push( slice );
     }
     let length = s_two.len() / 32;
     println!("{}",length);
     //println!("{}",vec_two);
-    println!("binary of hash: {}",h_two);//h_two.slice_to( length )
+    println!("sliced bin of hash: {}",h_two.slice_to( length ));
 }
