@@ -16,9 +16,12 @@ use core::fmt::{Binary};
 
 use crypto::pbkdf2::pbkdf2;
 use crypto::sha2::Sha256;
+use crypto::mac::Mac;
+use crypto::hmac::Hmac;
 use crypto::digest::Digest;
 
 static EMPTY:&'static str = "00000000";
+static PBKDF2_ROUNDS:u32 = 2048;
 
 //getopts help message
 fn print_usage(program: &str, _opts: &[OptGroup]) {
@@ -70,9 +73,6 @@ fn main() {
         Err(why) => panic!("couldn't read {}: {}", display, why.desc),
         Ok(string) => string,
     };
-    // for word in words.words() {
-    //     println!("{}",word)
-    // }
 
     println!("{}",words.words().count());
     //generate corner cases
@@ -95,7 +95,8 @@ fn main() {
                 let idx = std::num::from_str_radix::<int>(bin_idx, 2).unwrap();
                 mnemonic.push(words.words().nth(idx as uint).unwrap());
             }
-            println!("mnemonic: {}",mnemonic);
+            println!("mnemonic: {}",mnemonic.to_string());
+            to_seed(mnemonic.to_string().as_slice(),str_seed);
         }
     }
 
@@ -140,4 +141,11 @@ fn to_mnemonic(chars:String) -> String {
     println!("concatenated: {}",random_hash);
 
     random_hash
+}
+
+fn to_seed(mnemonic:&str, seed_value:&str) {
+    let mut mac = Hmac::new(Sha256::new(),mnemonic.as_bytes());
+    let mut result = Vec::new();
+    pbkdf2(&mut mac,seed_value.as_bytes(),PBKDF2_ROUNDS,result[mut]);
+    println!("{}", result);
 }
