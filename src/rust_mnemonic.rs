@@ -9,13 +9,16 @@ use std::os;
 use std::rand::{task_rng, OsRng, Rng};
 use std::io::File;
 use std::str;
-use serialize::hex::{ToHex, FromHex};
+use std::num::Int;
+use serialize::hex::{ToHex,FromHex};
 
 use core::fmt::{Binary};
 
 use crypto::pbkdf2::pbkdf2;
 use crypto::sha2::Sha256;
 use crypto::digest::Digest;
+
+static EMPTY:&'static str = "00000000";
 
 //getopts help message
 fn print_usage(program: &str, _opts: &[OptGroup]) {
@@ -82,16 +85,17 @@ fn main() {
     //generate random seeds
     for gen_seed in range(0u,12) {
         for take_num in range(0u,8 * (gen_seed % 3 + 2)) {
-            //let random_chars: Vec<u8> = task_rng().gen_iter::<u8>().take(take_num).collect(); //http://rustbyexample.com/staging/rand.html
             let random_chars:String = rng.gen_ascii_chars().take(take_num).collect();
-            //let random_chars:Vec<char> = task_rng().gen_iter::<char>().take(take_num).collect(); //generates any valid character
             println!("{}",random_chars);
-            to_mnemonic(random_chars);
-            // let thing = match str::from_utf8(random_chars.as_slice()) {
-            //     None => panic!("can't convert"),
-            //     Some(x) => x,
-            // };
-            //println!("{}",thing);
+            let random_hash = to_mnemonic(random_chars);
+            let mut mnemonic = Vec::new();
+
+            for i in range(0u,random_hash.len() / 11) {
+                let bin_idx = random_hash.slice(i*11,(i+1)*11);
+                let idx = std::num::from_str_radix::<int>(bin_idx, 2).unwrap();
+                mnemonic.push(words.words().nth(idx as uint).unwrap());
+            }
+            println!("mnemonic: {}",mnemonic);
         }
     }
 
@@ -107,33 +111,33 @@ fn gen_sha256(hashme:&str) -> String {
     sh.result_str()
 }
 
-fn to_mnemonic(chars:String) {
+fn to_binary(input:&[u8]) -> String {
+    let mut s_two = String::new();
+    for &s_byte in input.iter() {
+        let byte_slice = format!("{:b}",s_byte);
+        let mut empty = String::from_str(EMPTY);
+        empty.push_str(byte_slice.as_slice());
+        let slice = empty.slice_from(empty.len()-8);
+        s_two.push_str(slice);
+    }
+
+    s_two
+}
+
+fn to_mnemonic(chars:String) -> String {
     let h:String = gen_sha256(chars.as_slice());
     println!("{}",h);
     //get binary string of random seed
-    let mut s_two = String::new();
-    for &s_byte in chars.as_bytes().iter() {
-        let byte_slice = String::from_str(format!("{:b}",s_byte).as_slice());
-        let mut empty = String::from_str("00000000");
-        empty.push_str(byte_slice.as_slice());
-        let slice:String = String::from_str(empty.slice_from(empty.len()-8));
-        s_two.push_str(slice.as_slice());
-    }
+    let s_two:String = to_binary(chars.as_bytes());
     println!("binary of random chars: {}",s_two);
     //get binary str of sha256 hash
-    let mut h_two = String::new();
-    //let mut vec_two = Vec::new();
+    let h_two:String = to_binary(h.from_hex().unwrap().as_slice());
     //unwrap can get a result from Result<Vec<u8>> to Vec<u8> for example
-    for &h_byte in h.from_hex().unwrap().iter() {
-        let byte_slice = String::from_str(format!("{:b}",h_byte).as_slice());
-        let mut empty = String::from_str("00000000");
-        empty.push_str(byte_slice.as_slice());
-        let slice:String = String::from_str(empty.slice_from(empty.len()-8));
-        h_two.push_str(slice.as_slice());
-        //vec_two.push( slice );
-    }
     let length = s_two.len() / 32;
     println!("{}",length);
-    //println!("{}",vec_two);
     println!("sliced bin of hash: {}",h_two.slice_to( length ));
+    let random_hash:String =  s_two + h_two.slice_to( length ).as_slice();
+    println!("concatenated: {}",random_hash);
+
+    random_hash
 }
