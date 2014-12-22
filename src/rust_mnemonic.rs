@@ -93,10 +93,10 @@ fn main() {
             for i in range(0u,random_hash.len() / 11) {
                 let bin_idx = random_hash.slice(i*11,(i+1)*11);
                 let idx = std::num::from_str_radix::<int>(bin_idx, 2).unwrap();
-                mnemonic.push(words.words().nth(idx as uint).unwrap());
+                mnemonic.push(words.words().nth(idx as uint).unwrap()); //check for better way of doing this
             }
             println!("mnemonic: {}",mnemonic.to_string());
-            to_seed(mnemonic.to_string().as_slice(),str_seed);
+            to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
         }
     }
 
