@@ -1,3 +1,4 @@
+#![feature(slicing_syntax)]
 extern crate crypto;
 extern crate getopts;
 extern crate serialize;
@@ -6,17 +7,12 @@ extern crate core;
 use getopts::{reqopt,optflag,getopts,OptGroup};
 
 use std::os;
-use std::rand::{task_rng, OsRng, Rng};
+use std::rand::{OsRng, Rng};
 use std::io::File;
-use std::str;
-use std::num::Int;
-use serialize::hex::{ToHex,FromHex};
+use serialize::hex::{FromHex};
 
-use core::fmt::{Binary};
-
-use crypto::pbkdf2::pbkdf2;
+use crypto::pbkdf2::{pbkdf2,pbkdf2_simple};
 use crypto::sha2::Sha256;
-use crypto::mac::Mac;
 use crypto::hmac::Hmac;
 use crypto::digest::Digest;
 
@@ -29,6 +25,7 @@ fn print_usage(program: &str, _opts: &[OptGroup]) {
     println!("-s\t\tSeed");
     println!("-h --help\tUsage");
 }
+
 
 fn main() {
     /* start handling opts */
@@ -96,7 +93,11 @@ fn main() {
                 mnemonic.push(words.words().nth(idx as uint).unwrap()); //check for better way of doing this
             }
             println!("mnemonic: {}",mnemonic.to_string());
-            to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
+            let key_value = to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
+            println!("key: {}",key_value);
+            println!("stuff: {}",mnemonic.to_string().push_str(str_seed));
+            let out1 = pbkdf2_simple(mnemonic.to_string().as_slice(),PBKDF2_ROUNDS);
+            println!("{}",out1.unwrap());
         }
     }
 
@@ -143,9 +144,10 @@ fn to_mnemonic(chars:String) -> String {
     random_hash
 }
 
-fn to_seed(mnemonic:&str, seed_value:&str) {
+fn to_seed(mnemonic:&str, seed_value:&str) -> Vec<u8> {
     let mut mac = Hmac::new(Sha256::new(),mnemonic.as_bytes());
     let mut result = Vec::new();
     pbkdf2(&mut mac,seed_value.as_bytes(),PBKDF2_ROUNDS,result[mut]);
-    println!("{}", result);
+
+    result
 }
