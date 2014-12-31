@@ -10,17 +10,15 @@ use std::rand::{OsRng, Rng};
 use std::io::File;
 use serialize::hex::{FromHex};
 
-use crypto::pbkdf2::{pbkdf2,pbkdf2_simple};
-use crypto::sha1::Sha1;
-use crypto::sha2::Sha256;
-use crypto::md5::Md5;
-use crypto::mac::{Mac, MacResult};
+use crypto::pbkdf2::{pbkdf2};
+use crypto::sha2::{Sha256, Sha512};
+//use crypto::mac::{Mac, MacResult};
 use crypto::hmac::Hmac;
 use crypto::digest::Digest;
 
 static EMPTY:&'static str = "00000000";
 static PBKDF2_ROUNDS:u32 = 2048;
-static PBKDF2_KEY_LEN:uint = 32;
+static PBKDF2_KEY_LEN:uint = 64;
 
 //getopts help message
 fn print_usage(program: &str, _opts: &[OptGroup]) {
@@ -97,7 +95,7 @@ fn main() {
             }
             println!("mnemonic: {}",mnemonic.to_string());
             let key_value = to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
-            println!("key: {}",key_value.to_string());
+            //println!("key: {}",String::from_utf8(key_value).unwrap());
         }
     }
 
@@ -145,9 +143,11 @@ fn to_mnemonic(chars:String) -> String {
 }
 
 fn to_seed(mnemonic:&str, seed_value:&str) -> Vec<u8> {
-    let mut mac = Hmac::new(Sha256::new(),mnemonic.as_bytes());
+    let mut mac = Hmac::new(Sha512::new(),mnemonic.as_bytes());
     let mut result = Vec::from_elem(PBKDF2_KEY_LEN,0u8);
-    pbkdf2(&mut mac, seed_value.as_bytes(), PBKDF2_ROUNDS, result.as_mut_slice());
+    let mut salt:String = String::from_str("mnemonic");
+    salt.push_str(seed_value);
+    pbkdf2(&mut mac, salt.as_bytes(), PBKDF2_ROUNDS, result.as_mut_slice());
 
     result
 }
