@@ -8,7 +8,7 @@ use getopts::{reqopt,optflag,getopts,OptGroup};
 use std::os;
 use std::rand::{OsRng, Rng};
 use std::io::File;
-use serialize::hex::{FromHex};
+use serialize::hex::{FromHex, ToHex};
 
 use crypto::pbkdf2::{pbkdf2};
 use crypto::sha2::{Sha256, Sha512};
@@ -95,14 +95,11 @@ fn main() {
             }
             println!("mnemonic: {}",mnemonic.to_string());
             let key_value = to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
-            //println!("key: {}",String::from_utf8(key_value).unwrap());
+            println!("key: {}",key_value.as_slice().to_hex());
         }
     }
 
 }
-// this converts a String to Vec<u8>
-// let mut b = Vec::new();
-// b.push_all(h.as_bytes());
 
 fn gen_sha256(hashme:&str) -> String {
     let mut sh = Sha256::new();
