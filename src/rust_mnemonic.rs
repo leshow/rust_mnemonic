@@ -60,7 +60,6 @@ fn main() {
       Ok(g) => g,
       Err(e) => panic!("Failed to obtain OS RNG: {}", e)
     };
-
     let path = Path::new("src/wordslist/english.txt");
     let display = path.display();
     let mut file = match File::open(&path) {
@@ -71,34 +70,36 @@ fn main() {
         Err(why) => panic!("couldn't read {}: {}", display, why.desc),
         Ok(string) => string,
     };
-
-    println!("{}",words.words().count());
     //generate corner cases
     for &i in [16u,24,32].iter() {
         for n in ["00","7f","80","ff"].iter() {
-            println!("{}",n.repeat(i))
+            let corner_chars = n.repeat(i);
+            process(corner_chars,str_seed,words.as_slice());
         }
     }
 
     //generate random seeds
     for gen_seed in range(0u,12) {
-        for take_num in range(0u,8 * (gen_seed % 3 + 2)) {
-            let random_chars:String = rng.gen_ascii_chars().take(take_num).collect();
-            println!("{}",random_chars);
-            let random_hash = to_mnemonic(random_chars);
-            let mut mnemonic = Vec::new();
-
-            for i in range(0u,random_hash.len() / 11) {
-                let bin_idx = random_hash.slice(i*11,(i+1)*11);
-                let idx = std::num::from_str_radix::<int>(bin_idx, 2).unwrap();
-                mnemonic.push(words.words().nth(idx as uint).unwrap()); //check for better way of doing this
-            }
-            println!("mnemonic: {}",mnemonic.to_string());
-            let key_value = to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
-            println!("key: {}",key_value.as_slice().to_hex());
-        }
+            let length = 8 * (gen_seed % 3 + 2);
+            let random_chars:String = rng.gen_ascii_chars().take(length).collect();
+            process(random_chars,str_seed,words.as_slice());
     }
 
+}
+
+fn process(random_chars:String,str_seed:&str,words:&str) {
+    println!("{}",random_chars);
+    let random_hash = to_mnemonic(random_chars);
+    let mut mnemonic = Vec::new();
+
+    for i in range(0u,random_hash.len() / 11) {
+        let bin_idx = random_hash.slice(i*11,(i+1)*11);
+        let idx = std::num::from_str_radix::<int>(bin_idx, 2).unwrap();
+        mnemonic.push(words.words().nth(idx as uint).unwrap()); //check for better way of doing this
+    }
+    println!("mnemonic: {}",mnemonic.to_string());
+    let key_value = to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
+    println!("key: {}",key_value.as_slice().to_hex());
 }
 
 fn gen_sha256(hashme:&str) -> String {
