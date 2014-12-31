@@ -22,8 +22,11 @@ pbkdf2 keys still a WIP
 to get started, simply:
 
 git clone https://github.com/leshow/rust_mnemonic
+
 cd rust_mnemonic
+
 cargo update
+
 cargo build
 
 run with:
