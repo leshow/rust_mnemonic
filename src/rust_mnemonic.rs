@@ -124,18 +124,17 @@ fn to_binary(input:&[u8]) -> String {
 
 fn to_mnemonic(chars:String) -> String {
     let h:String = gen_sha256(chars.as_slice());
-    println!("{}",h);
+    //println!("{}",h);
     //get binary string of random seed
     let s_two:String = to_binary(chars.as_bytes());
-    println!("binary of random chars: {}",s_two);
+    //println!("binary of random chars: {}",s_two);
     //get binary str of sha256 hash
     let h_two:String = to_binary(h.from_hex().unwrap().as_slice());
     //unwrap can get a result from Result<Vec<u8>> to Vec<u8> for example
     let length = s_two.len() / 32;
-    println!("{}",length);
-    println!("sliced bin of hash: {}",h_two.slice_to( length ));
+    //println!("sliced bin of hash: {}",h_two.slice_to( length ));
     let random_hash:String =  s_two + h_two.slice_to( length ).as_slice();
-    println!("concatenated: {}",random_hash);
+    //println!("concatenated: {}",random_hash);
 
     random_hash
 }
