@@ -18,7 +18,7 @@ use crypto::digest::Digest;
 
 static EMPTY:&'static str = "00000000";
 static PBKDF2_ROUNDS:u32 = 2048;
-static PBKDF2_KEY_LEN:uint = 64;
+static PBKDF2_KEY_LEN:usize = 64;
 
 //getopts help message
 fn print_usage(program: &str, _opts: &[OptGroup]) {
@@ -71,7 +71,7 @@ fn main() {
         Ok(string) => string,
     };
     //generate corner cases
-    for &i in [16u,24,32].iter() {
+    for &i in [16us,24,32].iter() {
         for &n in ["00","7f","80","ff"].iter() {
             let corner_chars = repeat(n).take(i).collect();
             process(corner_chars,str_seed,words.as_slice());
@@ -79,7 +79,7 @@ fn main() {
     }
 
     //generate random seeds
-    for gen_seed in range(0u,12) {
+    for gen_seed in range(0us,12) {
             let length = 8 * (gen_seed % 3 + 2);
             let random_chars:String = rng.gen_ascii_chars().take(length).collect();
             process(random_chars,str_seed,words.as_slice());
@@ -92,12 +92,12 @@ fn process(random_chars:String,str_seed:&str,words:&str) {
     let random_hash = to_mnemonic(random_chars);
     let mut mnemonic = Vec::new();
 
-    for i in range(0u,random_hash.len() / 11) {
+    for i in range(0us,random_hash.len() / 11) {
         let bin_idx = random_hash.slice(i*11,(i+1)*11);
-        let idx = std::num::from_str_radix::<int>(bin_idx, 2).unwrap();
-        mnemonic.push(words.words().nth(idx as uint).unwrap()); //check for better way of doing this
+        let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
+        mnemonic.push(words.words().nth(idx as usize).unwrap()); //check for better way of doing this
     }
-    println!("mnemonic: {}",mnemonic.to_string());
+    println!("mnemonic: {}", mnemonic.to_string());
     let key_value = to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
     println!("key: {}",key_value.as_slice().to_hex());
 }
