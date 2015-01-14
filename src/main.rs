@@ -3,7 +3,7 @@ extern crate core;
 extern crate mnemonic;
 extern crate "rustc-serialize" as serialize;
 
-use mnemonic::*;
+use mnemonic::Mnemonic;
 
 use serialize::hex::{FromHex, ToHex};
 use getopts::{reqopt,optflag,getopts,OptGroup};
@@ -80,16 +80,16 @@ fn main() {
 
 fn process(random_chars:String,str_seed:&str,words:&str) {
     println!("{}",random_chars);
-    let random_hash = to_mnemonic(random_chars);
-    let mut mnemonic = Vec::new();
+    let mnemonic:Mnemonic = Mnemonic::new(random_chars);
+    let mut mnem_words = Vec::new();
 
-    for i in range(0us,random_hash.len() / 11) {
-        let bin_idx = random_hash.slice(i*11,(i+1)*11);
+    for i in range(0us,mnemonic.binary_hash.len() / 11) {
+        let bin_idx = mnemonic.binary_hash.slice(i*11,(i+1)*11);
         let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
-        mnemonic.push(words.words().nth(idx as usize).unwrap()); //check for better way of doing this
+        mnem_words.push(words.as_slice().words().nth(idx as usize).unwrap()); //check for better way of doing this
     }
-    let str_mnemonic = format!("{:?}",mnemonic);
+    let str_mnemonic = format!("{:?}",mnem_words);
     println!("mnemonic: {}", str_mnemonic);
-    let key_value = to_seed(str_mnemonic.as_slice(),str_seed);
+    let key_value = mnemonic.to_seed(str_mnemonic.as_slice(),str_seed); //to_string() on a Vec<&str>?
     println!("key: {}",key_value.as_slice().to_hex());
 }
