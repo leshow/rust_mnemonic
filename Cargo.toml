@@ -1,12 +1,20 @@
 [package]
 
 name = "rust_mnemonic"
-version = "0.1.0"
+version = "0.2.0"
 authors = [ "Evan Cameron <cameron.evan@gmail.com>" ]
+license = "MIT/Apache-2.0"
+homepage = "https://github.com/leshow/rust_mnemonic/"
+repository = "https://github.com/leshow/rust_mnemonic/"
+readme = "README.md"
 
 [[bin]]
 
-name = "rust_mnemonic"
+name = "main"
+
+[lib]
+name="mnemonic"
+path="src/lib.rs"
 
 [dependencies]
 rust-crypto="*"

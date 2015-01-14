@@ -1,6 +1,6 @@
 [root]
-name = "rust_mnemonic"
-version = "0.2.0"
+name = "mnemonic"
+version = "0.0.1"
 dependencies = [
  "rust-crypto 0.2.12 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
