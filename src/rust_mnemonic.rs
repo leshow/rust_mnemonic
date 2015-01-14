@@ -1,6 +1,6 @@
 extern crate crypto;
 extern crate getopts;
-extern crate serialize;
+extern crate "rustc-serialize" as serialize;
 extern crate core;
 
 use getopts::{reqopt,optflag,getopts,OptGroup};
@@ -97,8 +97,9 @@ fn process(random_chars:String,str_seed:&str,words:&str) {
         let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
         mnemonic.push(words.words().nth(idx as usize).unwrap()); //check for better way of doing this
     }
-    println!("mnemonic: {}", mnemonic.to_string());
-    let key_value = to_seed(mnemonic.to_string().as_slice(),str_seed); //to_string() on a Vec<&str>?
+    let str_mnemonic = format!("{:?}",mnemonic);
+    println!("mnemonic: {}", str_mnemonic);
+    let key_value = to_seed(str_mnemonic.as_slice(),str_seed);
     println!("key: {}",key_value.as_slice().to_hex());
 }
 
