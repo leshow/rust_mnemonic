@@ -3,8 +3,8 @@ extern crate core;
 extern crate mnemonic;
 extern crate "rustc-serialize" as serialize;
 
-use mnemonic::to_mnemonic;
-use mnemonic::to_seed;
+use mnemonic::*;
+
 use serialize::hex::{FromHex, ToHex};
 use getopts::{reqopt,optflag,getopts,OptGroup};
 
