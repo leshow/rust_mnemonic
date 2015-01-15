@@ -46,9 +46,6 @@ fn main() {
     /* end opts, seed value below */
     let str_seed:&str = seed.as_slice();
 
-    println!("{}", str_seed);
-    //println!("sha256: {}", gen_sha256(str_seed));
-
     let mut rng = match OsRng::new() {
       Ok(g) => g,
       Err(e) => panic!("Failed to obtain OS RNG: {}", e)
@@ -79,7 +76,7 @@ fn main() {
 }
 
 fn process(random_chars:String,str_seed:&str,words:&str) {
-    println!("{}",random_chars);
+    println!("random characters: {}",random_chars);
     let mnemonic:Mnemonic = Mnemonic::new(random_chars);
     let mut mnem_words = Vec::new();
 
