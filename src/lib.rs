@@ -5,7 +5,7 @@ use crypto::pbkdf2::{pbkdf2};
 use crypto::sha2::{Sha256, Sha512};
 use crypto::hmac::Hmac;
 use crypto::digest::Digest;
-use std::io::File;
+use std::old_io::File;
 use rustc_serialize::hex::{FromHex, ToHex};
 
 use std::iter::repeat;

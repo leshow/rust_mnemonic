@@ -11,7 +11,7 @@ use getopts::{reqopt,optflag,getopts,OptGroup};
 use std::os;
 use std::iter::repeat;
 use std::rand::{OsRng, Rng};
-use std::io::File;
+use std::old_io::File;
 
 //getopts help message
 fn print_usage(program: &str, _opts: &[OptGroup]) {
