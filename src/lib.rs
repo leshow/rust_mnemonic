@@ -32,7 +32,7 @@ impl Mnemonic {
         //concatenate the two binary strings together
         let random_hash:String =  s_two + h_two.slice_to( length ).as_slice();
 
-        Mnuemonic { binary_hash: random_hash }
+        Mnemonic { binary_hash: random_hash }
     }
 
     pub fn to_seed(&self, mnemonic: &str, seed_value: &str) -> Vec<u8> {
