@@ -24,7 +24,7 @@ cargo build
 ```
 run with:
 ```
-./target/rust-mnemonic -s SEED_STRING
+./target/main -s SEED_STRING
 ```
 
 If no seed is provided the seed string will be "seed". The seed string will be used in conjunction with the mnemonic for generating the pbkdf2 key.
