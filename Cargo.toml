@@ -13,9 +13,10 @@ readme = "README.md"
 name = "main"
 
 [lib]
-name="mnemonic"
+name="lib"
 path="src/lib.rs"
 
 [dependencies]
 rust-crypto="*"
 rustc-serialize="*"
+getopts="*"

@@ -1,50 +1,38 @@
+#![feature(rand)]
+#![feature(core)]
+#![feature(io)]
+#![feature(path)]
+#[warn(unused_imports)]
+
 extern crate getopts;
-extern crate core;
-extern crate mnemonic;
+extern crate lib;
 extern crate "rustc-serialize" as serialize;
 
-use mnemonic::Mnemonic;
+use lib::mnemonic::Mnemonic;
+use lib::settings::RuntimeSettings;
 
-use serialize::hex::{FromHex, ToHex};
-use getopts::{reqopt, optflag, getopts, OptGroup};
-
+use serialize::hex::ToHex;
 use std::os;
 use std::iter::repeat;
 use std::rand::{OsRng, Rng};
 use std::old_io::File;
-
-//getopts help message
-fn print_usage(program: &str, _opts: &[OptGroup]) {
-    println!("Usage: {} [options]", program);
-    println!("-s\t\tSeed");
-    println!("-h --help\tUsage");
-}
+use std::env;
 
 fn main() {
     /* start handling opts */
-    let args: Vec<String> = os::args();
-
-    let program = args[0].clone();
-
-    let opts = &[
-        reqopt("s", "seed", "set mnemonic seed", ""),
-        optflag("h", "help", "print this help menu")
-    ];
-    let matches = match getopts(args.tail(), opts) {
-        Ok(m) => { m }
-        Err(f) => { panic!(f.to_string()) }
-    };
-    if matches.opt_present("h") {
-        print_usage(program.as_slice(), opts);
+    let settings = RuntimeSettings::new(env::args());
+    if settings.print_help {
+        settings.print_usage();
         return;
     }
-    let seed = match matches.opt_str("s") {
-        Some(x) => x,
-        None => panic!("No seed given"),
-    };
 
-    /* end opts, seed value below */
-    let str_seed: &str = seed.as_slice();
+    //let str_seed: &str = settings.seed.unwrap_or("seed");
+
+    if settings.seed.is_some() {
+        println!("Seed set to: \"{}\"", settings.seed.unwrap());
+    }
+
+    let str_seed: &str = "seed";
 
     let mut rng = match OsRng::new() {
         Ok(g) => g,
@@ -68,7 +56,7 @@ fn main() {
     for &i in [16us, 24, 32].iter() {
         for &n in ["00", "7f", "80", "ff"].iter() {
             let corner_chars = repeat(n).take(i).collect();
-            process(corner_chars,str_seed,words.as_slice());
+            process(corner_chars, str_seed, &words[]);
         }
     }
 
@@ -77,7 +65,7 @@ fn main() {
         let length = 8 * (gen_seed % 3 + 2);
         let random_chars:String = rng.gen_ascii_chars().take(length).collect();
 
-        process(random_chars,str_seed,words.as_slice());
+        process(random_chars, str_seed, &words[]);
     }
 }
 
@@ -87,8 +75,8 @@ fn process(random_chars: String, str_seed: &str, words: &str) {
     let mnemonic: Mnemonic = Mnemonic::new(random_chars);
     let mut mnem_words = Vec::new();
 
-    for i in range(0us,mnemonic.binary_hash.len() / 11) {
-        let bin_idx = mnemonic.binary_hash.slice(i * 11,(i + 1) * 11);
+    for i in range(0us, mnemonic.binary_hash.len() / 11) {
+        let bin_idx = &mnemonic.binary_hash[i * 11 .. (i + 1) * 11];
         let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
 
         mnem_words.push(words.as_slice().words().nth(idx as usize).unwrap()); //check for better way of doing this
@@ -97,6 +85,6 @@ fn process(random_chars: String, str_seed: &str, words: &str) {
     let str_mnemonic = format!("{:?}",mnem_words);
     println!("mnemonic: {}", str_mnemonic);
 
-    let key_value = mnemonic.to_seed(str_mnemonic.as_slice(),str_seed); //to_string() on a Vec<&str>?
-    println!("key: {}",key_value.as_slice().to_hex());
+    let key_value = mnemonic.to_seed(&str_mnemonic[],str_seed); //to_string() on a Vec<&str>?
+    println!("key: {}", &key_value[].to_hex());
 }
