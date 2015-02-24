@@ -1,20 +1,17 @@
-#![feature(rand)]
 #![feature(core)]
-#![feature(io)]
-#![feature(path)]
-#[warn(unused_imports)]
+#![feature(old_io)]
 
 extern crate getopts;
 extern crate lib;
+extern crate rand;
 extern crate "rustc-serialize" as serialize;
 
 use lib::mnemonic::Mnemonic;
 use lib::settings::RuntimeSettings;
 
 use serialize::hex::ToHex;
-use std::os;
 use std::iter::repeat;
-use std::rand::{OsRng, Rng};
+use rand::{OsRng, Rng};
 use std::old_io::File;
 use std::env;
 
@@ -85,6 +82,6 @@ fn process(random_chars: String, str_seed: &str, words: &str) {
     let str_mnemonic = format!("{:?}",mnem_words);
     println!("mnemonic: {}", str_mnemonic);
 
-    let key_value = mnemonic.to_seed(&str_mnemonic[],str_seed); //to_string() on a Vec<&str>?
-    println!("key: {}", &key_value[].to_hex());
+    let key_value = mnemonic.to_seed(&str_mnemonic[], str_seed); //to_string() on a Vec<&str>?
+    println!("key: {}", key_value[].to_hex());
 }

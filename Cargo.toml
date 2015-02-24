@@ -13,10 +13,11 @@ readme = "README.md"
 name = "main"
 
 [lib]
-name="lib"
-path="src/lib.rs"
+name = "lib"
+path = "src/lib.rs"
 
 [dependencies]
-rust-crypto="*"
-rustc-serialize="*"
-getopts="*"
+rust-crypto = "*"
+rustc-serialize = "*"
+getopts = "*"
+rand = "*"
