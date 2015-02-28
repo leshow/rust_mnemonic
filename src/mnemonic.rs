@@ -4,8 +4,6 @@ use crypto::hmac::Hmac;
 use crypto::digest::Digest;
 use rustc_serialize::hex::{FromHex};
 
-use std::iter::repeat;
-
 static EMPTY: &'static str = "00000000";
 static PBKDF2_ROUNDS: u32 = 2048;
 static PBKDF2_KEY_LEN: usize = 64;
@@ -16,17 +14,17 @@ pub struct Mnemonic {
 
 impl Mnemonic {
     pub fn new(chars:String) -> Mnemonic {
-        let h: String = Mnemonic::gen_sha256(&chars[]);
+        let h: String = Mnemonic::gen_sha256(&chars);
 
         //get binary string of random seed
         let s_two: String = Mnemonic::to_binary(chars.as_bytes());
 
         //get binary str of sha256 hash
-        let h_two: String = Mnemonic::to_binary(&h.from_hex().unwrap()[]);
+        let h_two: String = Mnemonic::to_binary(&h.from_hex().unwrap());
         let length = s_two.len() / 32;
 
         //concatenate the two binary strings together
-        let random_hash: String =  s_two + &h_two[.. length][]; //h_two.slice_to( length ).as_slice()
+        let random_hash: String =  s_two + &h_two[.. length]; //h_two.slice_to( length ).as_slice()
 
         Mnemonic { binary_hash: random_hash }
     }
@@ -56,7 +54,7 @@ impl Mnemonic {
             let byte_slice = format!("{:b}",s_byte);
             let mut empty = String::from_str(EMPTY);
 
-            empty.push_str(&byte_slice[]);
+            empty.push_str(&byte_slice);
 
             let slice = &empty[empty.len()-8 ..];
 

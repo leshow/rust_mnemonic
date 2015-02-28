@@ -1,5 +1,5 @@
 #![feature(core)]
-#![feature(old_io)]
+#![feature(collections)]
 #![feature(env)]
 
 extern crate getopts;
@@ -53,19 +53,19 @@ fn main() {
     let words: Vec<_> = word_backing.words().collect();
 
     //generate corner cases
-    for &i in [16us, 24, 32].iter() {
+    for &i in [16usize, 24, 32].iter() {
         for &n in ["00", "7f", "80", "ff"].iter() {
             let corner_chars = repeat(n).take(i).collect();
-            process(corner_chars, str_seed, &words[]);
+            process(corner_chars, str_seed, &words);
         }
     }
 
     //generate random seeds
-    for gen_seed in range(0us, 12) {
+    for gen_seed in range(0usize, 12) {
         let length = 8 * (gen_seed % 3 + 2);
         let random_chars:String = rng.gen_ascii_chars().take(length).collect();
 
-        process(random_chars, str_seed, &words[]);
+        process(random_chars, str_seed, &words);
     }
 }
 
@@ -75,7 +75,7 @@ fn process(random_chars: String, str_seed: &str, words: &[&str]) {
     let mnemonic: Mnemonic = Mnemonic::new(random_chars);
     let mut mnem_words = Vec::new();
 
-    for i in range(0us, mnemonic.binary_hash.len() / 11) {
+    for i in range(0usize, mnemonic.binary_hash.len() / 11) {
         let bin_idx = &mnemonic.binary_hash[i * 11 .. (i + 1) * 11];
         let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
 
@@ -85,6 +85,6 @@ fn process(random_chars: String, str_seed: &str, words: &[&str]) {
     let str_mnemonic = format!("{:?}",mnem_words);
     println!("mnemonic: {}", str_mnemonic);
 
-    let key_value = mnemonic.to_seed(&str_mnemonic[], str_seed); //to_string() on a Vec<&str>?
-    println!("key: {}", key_value[].to_hex());
+    let key_value = mnemonic.to_seed(&str_mnemonic, str_seed); //to_string() on a Vec<&str>?
+    println!("key: {}", key_value.to_hex());
 }
