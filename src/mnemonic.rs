@@ -24,7 +24,7 @@ impl Mnemonic {
         let length = s_two.len() / 32;
 
         //concatenate the two binary strings together
-        let random_hash: String =  s_two + &h_two[.. length]; //h_two.slice_to( length ).as_slice()
+        let random_hash: String =  s_two + &h_two[.. length];
 
         Mnemonic { binary_hash: random_hash }
     }
@@ -32,7 +32,7 @@ impl Mnemonic {
     pub fn to_seed(&self, mnemonic: &str, seed_value: &str) -> Vec<u8> {
         let mut mac = Hmac::new(Sha512::new(), mnemonic.as_bytes());
 
-        let mut result: Vec<u8> = vec![0u8; PBKDF2_KEY_LEN];
+        let mut result = vec![0u8; PBKDF2_KEY_LEN];
         let salt = format!("mnemonic{}", seed_value);
 
         pbkdf2(&mut mac, salt.as_bytes(), PBKDF2_ROUNDS, &mut result);
