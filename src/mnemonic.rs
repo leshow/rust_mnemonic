@@ -34,11 +34,10 @@ impl Mnemonic {
     pub fn to_seed(&self, mnemonic: &str, seed_value: &str) -> Vec<u8> {
         let mut mac = Hmac::new(Sha512::new(), mnemonic.as_bytes());
 
-        let mut result: Vec<u8> = repeat(0).take(PBKDF2_KEY_LEN).collect();
-        let mut salt = String::from_str("mnemonic");
+        let mut result: Vec<u8> = vec![0u8; PBKDF2_KEY_LEN];
+        let salt = format!("mnemonic{}", seed_value);
 
-        salt.push_str(seed_value);
-        pbkdf2(&mut mac, salt.as_bytes(), PBKDF2_ROUNDS, result.as_mut_slice());
+        pbkdf2(&mut mac, salt.as_bytes(), PBKDF2_ROUNDS, &mut result);
 
         result
     }

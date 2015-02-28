@@ -1,5 +1,6 @@
 #![feature(core)]
 #![feature(old_io)]
+#![feature(env)]
 
 extern crate getopts;
 extern crate lib;
@@ -15,6 +16,7 @@ use rand::{OsRng, Rng};
 use std::old_io::File;
 use std::env;
 
+
 fn main() {
     /* start handling opts */
     let settings = RuntimeSettings::new(env::args());
@@ -23,13 +25,13 @@ fn main() {
         return;
     }
 
-    //let str_seed: &str = settings.seed.unwrap_or("seed");
+    let str_seed: &str = &settings.seed.unwrap_or(String::from_str("seed"));
 
-    if settings.seed.is_some() {
-        println!("Seed set to: \"{}\"", settings.seed.unwrap());
-    }
-
-    let str_seed: &str = "seed";
+    // let str_seed: &str = match settings.seed {
+    //     Some(x) => { println!("Seed set to: \"{}\"", x);
+    //                  &x },
+    //     None => "seed",
+    // };
 
     let mut rng = match OsRng::new() {
         Ok(g) => g,
@@ -44,10 +46,11 @@ fn main() {
         Ok(file) => file,
     };
 
-    let words:String = match file.read_to_string() {
+    let word_backing: String = match file.read_to_string() {
         Err(why) => panic!("couldn't read {}: {}", display, why.desc),
         Ok(string) => string,
     };
+    let words: Vec<_> = word_backing.words().collect();
 
     //generate corner cases
     for &i in [16us, 24, 32].iter() {
@@ -66,7 +69,7 @@ fn main() {
     }
 }
 
-fn process(random_chars: String, str_seed: &str, words: &str) {
+fn process(random_chars: String, str_seed: &str, words: &[&str]) {
     println!("random characters: {}",random_chars);
 
     let mnemonic: Mnemonic = Mnemonic::new(random_chars);
@@ -76,7 +79,7 @@ fn process(random_chars: String, str_seed: &str, words: &str) {
         let bin_idx = &mnemonic.binary_hash[i * 11 .. (i + 1) * 11];
         let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
 
-        mnem_words.push(words.as_slice().words().nth(idx as usize).unwrap()); //check for better way of doing this
+        mnem_words.push(words[idx as usize]);
     }
 
     let str_mnemonic = format!("{:?}",mnem_words);
