@@ -1,5 +1,4 @@
 #![feature(collections)]
-#![feature(env)]
 
 extern crate crypto;
 extern crate "rustc-serialize" as rustc_serialize;

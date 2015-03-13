@@ -1,6 +1,5 @@
 #![feature(core)]
 #![feature(collections)]
-#![feature(env)]
 
 extern crate getopts;
 extern crate lib;
@@ -13,7 +12,8 @@ use lib::settings::RuntimeSettings;
 use serialize::hex::ToHex;
 use std::iter::repeat;
 use rand::{OsRng, Rng};
-use std::old_io::File;
+use std::fs::File;
+use std::io::Read;
 use std::env;
 
 
@@ -42,12 +42,12 @@ fn main() {
     let display = path.display();
 
     let mut file = match File::open(&path) {
-        Err(why) => panic!("couldn't open {}: {}", display, why.desc),
+        Err(why) => panic!("couldn't open {}: {}", display, why),
         Ok(file) => file,
     };
 
     let word_backing: String = match file.read_to_string() {
-        Err(why) => panic!("couldn't read {}: {}", display, why.desc),
+        Err(why) => panic!("couldn't read {}: {}", display, why),
         Ok(string) => string,
     };
     let words: Vec<_> = word_backing.words().collect();
