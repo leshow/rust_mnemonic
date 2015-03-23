@@ -1,6 +1,5 @@
 #![feature(core)]
 #![feature(collections)]
-#![feature(env)]
 
 extern crate getopts;
 extern crate lib;
@@ -61,7 +60,7 @@ fn main() {
     }
 
     //generate random seeds
-    for gen_seed in range(0usize, 12) {
+    for gen_seed in (0usize .. 12) {
         let length = 8 * (gen_seed % 3 + 2);
         let random_chars:String = rng.gen_ascii_chars().take(length).collect();
 
@@ -75,7 +74,7 @@ fn process(random_chars: String, str_seed: &str, words: &[&str]) {
     let mnemonic: Mnemonic = Mnemonic::new(random_chars);
     let mut mnem_words = Vec::new();
 
-    for i in range(0usize, mnemonic.binary_hash.len() / 11) {
+    for i in (0usize .. mnemonic.binary_hash.len() / 11) {
         let bin_idx = &mnemonic.binary_hash[i * 11 .. (i + 1) * 11];
         let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
 
