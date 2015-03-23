@@ -11,10 +11,12 @@ use lib::settings::RuntimeSettings;
 
 use serialize::hex::ToHex;
 use std::iter::repeat;
+use std::io::prelude::*;
 use rand::{OsRng, Rng};
-use std::old_io::File;
+use std::fs::File;
 use std::env;
-
+use std::path::Path;
+use std::error::Error;
 
 fn main() {
     /* start handling opts */
@@ -39,16 +41,20 @@ fn main() {
 
     let path = Path::new("src/wordslist/english.txt");
     let display = path.display();
-
     let mut file = match File::open(&path) {
-        Err(why) => panic!("couldn't open {}: {}", display, why.desc),
+        // The `desc` field of `IoError` is a string that describes the error
+        Err(why) => panic!("couldn't open {}: {}", display,
+                                                   Error::description(&why)),
         Ok(file) => file,
     };
 
-    let word_backing: String = match file.read_to_string() {
-        Err(why) => panic!("couldn't read {}: {}", display, why.desc),
-        Ok(string) => string,
+    let mut s = String::new();
+    let word_backing = match file.read_to_string(&mut s) {
+        Err(why) => panic!("couldn't read {}: {}", display,
+                                                   Error::description(&why)),
+        Ok(s) => s,
     };
+
     let words: Vec<_> = word_backing.words().collect();
 
     //generate corner cases
