@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/leshow/rust_mnemonic.svg?branch=master)](https://travis-ci.org/leshow/rust_mnemonic)
+
+
 #################
 # rust mnemonic #
 #################
