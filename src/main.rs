@@ -48,14 +48,14 @@ fn main() {
         Ok(file) => file,
     };
 
-    let mut s = String::new();
-    let word_backing = match file.read_to_string(&mut s) {
+    let mut string_from_file = String::new();
+    match file.read_to_string(&mut string_from_file) {
         Err(why) => panic!("couldn't read {}: {}", display,
                                                    Error::description(&why)),
-        Ok(s) => s,
+        Ok(_) => println!("read to string_from_file"),
     };
 
-    let words: Vec<_> = word_backing.words().collect();
+    let words: Vec<_> = string_from_file.words().collect();
 
     //generate corner cases
     for &i in [16usize, 24, 32].iter() {
