@@ -1,15 +1,16 @@
 #![feature(core)]
 #![feature(collections)]
+#![feature(str_words)]
 
 extern crate getopts;
 extern crate lib;
 extern crate rand;
-extern crate "rustc-serialize" as serialize;
+extern crate rustc_serialize;
 
 use lib::mnemonic::Mnemonic;
 use lib::settings::RuntimeSettings;
 
-use serialize::hex::ToHex;
+use rustc_serialize::hex::ToHex;
 use std::iter::repeat;
 use std::io::prelude::*;
 use rand::{OsRng, Rng};
