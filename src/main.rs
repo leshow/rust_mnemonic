@@ -1,6 +1,4 @@
-#![feature(core)]
 #![feature(collections)]
-#![feature(str_words)]
 
 extern crate getopts;
 extern crate lib;
@@ -18,6 +16,7 @@ use std::fs::File;
 use std::env;
 use std::path::Path;
 use std::error::Error;
+use std::isize;
 
 fn main() {
     /* start handling opts */
@@ -56,7 +55,7 @@ fn main() {
         Ok(_) => println!("read to string_from_file"),
     };
 
-    let words: Vec<_> = string_from_file.words().collect();
+    let words: Vec<_> = string_from_file.split_whitespace().collect();
 
     //generate corner cases
     for &i in [16usize, 24, 32].iter() {
@@ -83,7 +82,7 @@ fn process(random_chars: String, str_seed: &str, words: &[&str]) {
 
     for i in (0usize .. mnemonic.binary_hash.len() / 11) {
         let bin_idx = &mnemonic.binary_hash[i * 11 .. (i + 1) * 11];
-        let idx = std::num::from_str_radix::<isize>(bin_idx, 2).unwrap();
+        let idx = isize::from_str_radix(bin_idx, 2).unwrap();
 
         mnem_words.push(words[idx as usize]);
     }
