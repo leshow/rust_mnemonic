@@ -1,5 +1,3 @@
-#![feature(collections)]
-
 extern crate crypto;
 extern crate rustc_serialize;
 extern crate getopts;
