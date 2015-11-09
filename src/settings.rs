@@ -1,4 +1,5 @@
 use std::env::Args;
+use std::str::FromStr;
 use getopts::Options;
 
 pub struct RuntimeSettings {
@@ -20,7 +21,7 @@ impl RuntimeSettings {
             Err(f) =>  panic!(f.to_string())
         };
 
-        let prog = String::from_str("mnemonic");
+        let prog = String::from_str("mnemonic").unwrap();
 
         RuntimeSettings {
             print_help: matches.opt_present("h"),

@@ -4,6 +4,8 @@ use crypto::hmac::Hmac;
 use crypto::digest::Digest;
 use rustc_serialize::hex::{FromHex};
 
+use std::str::FromStr;
+
 static EMPTY: &'static str = "00000000";
 static PBKDF2_ROUNDS: u32 = 2048;
 static PBKDF2_KEY_LEN: usize = 64;
@@ -52,7 +54,7 @@ impl Mnemonic {
 
         for &s_byte in input.iter() {
             let byte_slice = format!("{:b}",s_byte);
-            let mut empty = String::from_str(EMPTY);
+            let mut empty = String::from_str(EMPTY).unwrap();
 
             empty.push_str(&byte_slice);
 

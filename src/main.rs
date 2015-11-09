@@ -10,6 +10,7 @@ use lib::settings::RuntimeSettings;
 
 use rustc_serialize::hex::ToHex;
 use std::iter::repeat;
+use std::str::FromStr;
 use std::io::prelude::*;
 use rand::{OsRng, Rng};
 use std::fs::File;
@@ -26,7 +27,7 @@ fn main() {
         return;
     }
 
-    let str_seed: &str = &settings.seed.unwrap_or(String::from_str("seed"));
+    let str_seed: &str = &settings.seed.unwrap_or(String::from_str("seed").unwrap());
 
     // let str_seed: &str = match settings.seed {
     //     Some(x) => { println!("Seed set to: \"{}\"", x);
