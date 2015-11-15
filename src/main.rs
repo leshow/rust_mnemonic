@@ -1,5 +1,3 @@
-#![feature(collections)]
-
 extern crate getopts;
 extern crate lib;
 extern crate rand;
@@ -29,12 +27,6 @@ fn main() {
 
     let str_seed: &str = &settings.seed.unwrap_or(String::from_str("seed").unwrap());
 
-    // let str_seed: &str = match settings.seed {
-    //     Some(x) => { println!("Seed set to: \"{}\"", x);
-    //                  &x },
-    //     None => "seed",
-    // };
-
     let mut rng = match OsRng::new() {
         Ok(g) => g,
         Err(e) => panic!("Failed to obtain OS RNG: {}", e)
@@ -43,7 +35,6 @@ fn main() {
     let path = Path::new("src/wordslist/english.txt");
     let display = path.display();
     let mut file = match File::open(&path) {
-        // The `desc` field of `IoError` is a string that describes the error
         Err(why) => panic!("couldn't open {}: {}", display,
                                                    Error::description(&why)),
         Ok(file) => file,
@@ -67,7 +58,7 @@ fn main() {
     }
 
     //generate random seeds
-    for gen_seed in (0usize .. 12) {
+    for gen_seed in 0usize .. 12 {
         let length = 8 * (gen_seed % 3 + 2);
         let random_chars:String = rng.gen_ascii_chars().take(length).collect();
 
@@ -81,7 +72,7 @@ fn process(random_chars: String, str_seed: &str, words: &[&str]) {
     let mnemonic: Mnemonic = Mnemonic::new(random_chars);
     let mut mnem_words = Vec::new();
 
-    for i in (0usize .. mnemonic.binary_hash.len() / 11) {
+    for i in 0usize .. mnemonic.binary_hash.len() / 11 {
         let bin_idx = &mnemonic.binary_hash[i * 11 .. (i + 1) * 11];
         let idx = isize::from_str_radix(bin_idx, 2).unwrap();
 

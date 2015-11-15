@@ -24,7 +24,7 @@ impl Mnemonic {
         //get binary str of sha256 hash
         let h_two: String = Mnemonic::to_binary(&h.from_hex().unwrap());
         let length = s_two.len() / 32;
-
+        
         //concatenate the two binary strings together
         let random_hash: String =  s_two + &h_two[.. length];
 
