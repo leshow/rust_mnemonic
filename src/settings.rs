@@ -6,6 +6,12 @@ pub struct RuntimeSettings {
     pub print_help: bool,
     pub program: String,
     pub seed: Option<String>,
+    pub mode: Mode,
+}
+
+pub enum Mode {
+    Default,
+    Num(u8),
 }
 
 impl RuntimeSettings {
@@ -15,10 +21,11 @@ impl RuntimeSettings {
 
         opts.optflag("h", "help", "prints this help menu");
         opts.optopt("s", "seed", "set mnemonic seed", ""); //reqopt would make it required
+        opts.optopt("n", "num", "set mnemonic seed", "");
 
         let matches = match opts.parse(args) {
-            Ok(m) =>  m,
-            Err(f) =>  panic!(f.to_string())
+            Ok(m) => m,
+            Err(f) => panic!(f.to_string()),
         };
 
         let prog = String::from_str("mnemonic").unwrap();
@@ -27,6 +34,7 @@ impl RuntimeSettings {
             print_help: matches.opt_present("h"),
             program: prog,
             seed: matches.opt_str("s"),
+            mode: Mode::Default,
         }
     }
 

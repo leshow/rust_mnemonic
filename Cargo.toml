@@ -18,4 +18,6 @@ path = "src/lib.rs"
 [dependencies]
 rust-crypto = "0.2.36"
 rustc-serialize = "0.3.19"
+nom = "1.2.4"
+rand = "0.3.14"
 getopts = "*"

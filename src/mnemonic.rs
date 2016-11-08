@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crypto::pbkdf2::pbkdf2;
 use crypto::sha2::{Sha256, Sha512};
 use crypto::hmac::Hmac;
@@ -64,5 +66,11 @@ impl Mnemonic {
         sh.input_str(hashme);
 
         sh.result_str()
+    }
+}
+
+impl fmt::Debug for Mnemonic {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Generated: \n random characters: {:?} \n mnemonic: ", String::from_utf8_lossy(&self.mnemonic[..self.mnemonic.len()-1]))
     }
 }
