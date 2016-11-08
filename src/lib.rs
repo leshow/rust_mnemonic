@@ -1,6 +1,15 @@
 extern crate crypto;
 extern crate rustc_serialize;
 extern crate getopts;
+extern crate rand;
 
-pub mod mnemonic;
+#[macro_use]
+extern crate nom;
+
+pub use mnemonicbuilder::MnemonicBuilder;
+pub use mnemonic::Mnemonic;
+
+mod mnemonicbuilder;
+mod mnemonic;
+
 pub mod settings;

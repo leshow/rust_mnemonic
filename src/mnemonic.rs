@@ -1,34 +1,31 @@
-use crypto::pbkdf2::{pbkdf2};
+use crypto::pbkdf2::pbkdf2;
 use crypto::sha2::{Sha256, Sha512};
 use crypto::hmac::Hmac;
 use crypto::digest::Digest;
-use rustc_serialize::hex::{FromHex};
 
-use std::str::FromStr;
+use rustc_serialize::hex::FromHex;
+use rustc_serialize::json;
 
-static EMPTY: &'static str = "00000000";
+use nom::IResult;
+
 static PBKDF2_ROUNDS: u32 = 2048;
 static PBKDF2_KEY_LEN: usize = 64;
 
+#[derive(RustcEncodable)]
+struct MnemonicResponse {
+    passphrase: String,
+}
+
 pub struct Mnemonic {
-    pub binary_hash: String,
+    pub mnemonic: Vec<u8>,
 }
 
 impl Mnemonic {
-    pub fn new(chars:String) -> Mnemonic {
-        let h: String = Mnemonic::gen_sha256(&chars);
+    pub fn new(chars: &str) -> Mnemonic {
+        let h = Mnemonic::gen_sha256(&chars).from_hex().unwrap();
+        let length = chars.len() / 32;
 
-        //get binary string of random seed
-        let s_two: String = Mnemonic::to_binary(chars.as_bytes());
-
-        //get binary str of sha256 hash
-        let h_two: String = Mnemonic::to_binary(&h.from_hex().unwrap());
-        let length = s_two.len() / 32;
-        
-        //concatenate the two binary strings together
-        let random_hash: String =  s_two + &h_two[.. length];
-
-        Mnemonic { binary_hash: random_hash }
+        Mnemonic { mnemonic: [chars.as_ref(), &h[..length]].concat() }
     }
 
     pub fn to_seed(&self, mnemonic: &str, seed_value: &str) -> Vec<u8> {
@@ -42,27 +39,30 @@ impl Mnemonic {
         result
     }
 
+    pub fn to_words<'a>(&'a self, wordslist: &'a [String]) -> Vec<&str> {
+        // Some explanation is necessary.. This uses nom's combinator macros to create a function
+        // that makes a parser specifically for grabbing bits 11 at a time, dumping in a u16
+        named!(bit_vec<Vec<u16> >, bits!(many0!(take_bits!(u16, 11))));
+
+        let mut mnem_words = Vec::new();
+        if let IResult::Done(_, bit_sequence) = bit_vec(self.mnemonic.as_slice()) {
+            for idx in bit_sequence.iter() {
+                mnem_words.push(wordslist[*idx as usize].as_ref());
+            }
+        }
+
+        mnem_words
+    }
+
+    pub fn to_json(&self, wordslist: &[String]) -> String {
+        let words = self.to_words(wordslist).join(" ");
+        json::encode(&MnemonicResponse { passphrase: words }).unwrap()
+    }
+
     fn gen_sha256(hashme: &str) -> String {
         let mut sh = Sha256::new();
         sh.input_str(hashme);
 
         sh.result_str()
-    }
-
-    fn to_binary(input: &[u8]) -> String {
-        let mut s_two = String::new();
-
-        for &s_byte in input.iter() {
-            let byte_slice = format!("{:b}",s_byte);
-            let mut empty = String::from_str(EMPTY).unwrap();
-
-            empty.push_str(&byte_slice);
-
-            let slice = &empty[empty.len()-8 ..];
-
-            s_two.push_str(slice);
-        }
-
-        s_two
     }
 }
