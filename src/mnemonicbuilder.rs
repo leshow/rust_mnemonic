@@ -1,12 +1,14 @@
 #![allow(dead_code)]
 // crates
-use rand::{OsRng, Rng};
+
 // lib
+
 use mnemonic::Mnemonic;
+use rand::{OsRng, Rng};
 // std
 use std::fs::File;
+use std::io::{Error, Read};
 use std::path::Path;
-use std::io::{Read, Error};
 
 static LENGTH: usize = 32;
 
@@ -25,28 +27,36 @@ impl<'a> MnemonicBuilder<'a> {
         File::open(&path)?
             .read_to_string(&mut string_from_file)?;
 
-        let words: Vec<String> = string_from_file.split_whitespace()
+        let words: Vec<String> = string_from_file
+            .split_whitespace()
             .map(|s| s.into())
             .collect();
 
-        Ok(MnemonicBuilder {
-            seed: str_seed,
-            wordslist: words,
-            bit_length: LENGTH,
-        })
+        Ok(
+            MnemonicBuilder {
+                seed: str_seed,
+                wordslist: words,
+                bit_length: LENGTH,
+            },
+        )
     }
 
     pub fn with_seed(self, new_seed: &'a str) -> MnemonicBuilder<'a> {
-        MnemonicBuilder { seed: new_seed, ..self }
+        MnemonicBuilder {
+            seed: new_seed,
+            ..self
+        }
     }
 
     pub fn with_words(self, new_wordslist: Vec<String>) -> MnemonicBuilder<'a> {
-        MnemonicBuilder { wordslist: new_wordslist, ..self }
+        MnemonicBuilder {
+            wordslist: new_wordslist,
+            ..self
+        }
     }
 
     pub fn create(&self) -> Result<Mnemonic, Error> {
-        let random_chars: String = OsRng::new()
-            ?
+        let random_chars: String = OsRng::new()?
             .gen_ascii_chars()
             .take(self.bit_length)
             .collect();

@@ -1,6 +1,6 @@
+use getopts::Options;
 use std::env::Args;
 use std::str::FromStr;
-use getopts::Options;
 
 pub struct RuntimeSettings {
     pub print_help: bool,

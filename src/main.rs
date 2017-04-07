@@ -2,11 +2,11 @@ extern crate getopts;
 
 extern crate lib;
 
-use std::env;
+use lib::mnemonic::Mnemonic;
 
 use lib::mnemonicbuilder::MnemonicBuilder;
-use lib::mnemonic::Mnemonic;
 use lib::settings::RuntimeSettings;
+use std::env;
 
 fn main() {
     // start handling opts

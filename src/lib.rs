@@ -1,7 +1,7 @@
 extern crate crypto;
-extern crate rustc_serialize;
 extern crate getopts;
 extern crate rand;
+extern crate rustc_serialize;
 
 #[macro_use]
 extern crate nom;

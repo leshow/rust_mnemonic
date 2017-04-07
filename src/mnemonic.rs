@@ -1,14 +1,15 @@
-use std::fmt;
+
+use crypto::digest::Digest;
+use crypto::hmac::Hmac;
 
 use crypto::pbkdf2::pbkdf2;
 use crypto::sha2::{Sha256, Sha512};
-use crypto::hmac::Hmac;
-use crypto::digest::Digest;
+
+use nom::IResult;
 
 use rustc_serialize::hex::FromHex;
 use rustc_serialize::json;
-
-use nom::IResult;
+use std::fmt;
 
 static PBKDF2_ROUNDS: u32 = 2048;
 static PBKDF2_KEY_LEN: usize = 64;
