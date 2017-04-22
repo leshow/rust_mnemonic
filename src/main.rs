@@ -15,7 +15,7 @@ fn main() {
         settings.print_usage();
         return;
     }
-    // TODO handle opts
+
     let builder = MnemonicBuilder::new().expect("Failed to open wordslist.");
 
     let mnemonic: Mnemonic = builder.create().expect("Cannot create mnemonic.");

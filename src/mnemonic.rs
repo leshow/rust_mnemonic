@@ -1,4 +1,4 @@
-
+pub use self::MnemonicError::*;
 use crypto::digest::Digest;
 use crypto::hmac::Hmac;
 
@@ -6,17 +6,18 @@ use crypto::pbkdf2::pbkdf2;
 use crypto::sha2::{Sha256, Sha512};
 
 use nom::IResult;
+use serde_json;
 
-use rustc_serialize::hex::FromHex;
-use rustc_serialize::json;
+use std::error::Error;
 use std::fmt;
+use std::io::Error as ioErr;
 
 static PBKDF2_ROUNDS: u32 = 2048;
 static PBKDF2_KEY_LEN: usize = 64;
 
-#[derive(RustcEncodable)]
-struct MnemonicResponse {
-    passphrase: String,
+#[derive(Serialize)]
+struct MnemonicResponse<'a> {
+    passphrase: &'a str,
 }
 
 pub struct Mnemonic {
@@ -25,7 +26,7 @@ pub struct Mnemonic {
 
 impl Mnemonic {
     pub fn new(chars: &str) -> Mnemonic {
-        let h = Mnemonic::gen_sha256(chars).from_hex().unwrap();
+        let h = Mnemonic::from_hex(Mnemonic::gen_sha256(chars)).unwrap();
         let length = chars.len() / 32;
 
         Mnemonic { mnemonic: [chars.as_ref(), &h[..length]].concat() }
@@ -57,9 +58,9 @@ impl Mnemonic {
         mnem_words
     }
 
-    pub fn to_json(&self, wordslist: &[String]) -> String {
+    pub fn to_json(&self, wordslist: &[String]) -> Result<String, MnemonicError> {
         let words = self.to_words(wordslist).join(" ");
-        json::encode(&MnemonicResponse { passphrase: words }).unwrap()
+        Ok(serde_json::to_string(&MnemonicResponse { passphrase: &words })?,)
     }
 
     fn gen_sha256(hashme: &str) -> String {
@@ -68,10 +69,87 @@ impl Mnemonic {
 
         sh.result_str()
     }
+
+    fn from_hex(from: String) -> Result<Vec<u8>, MnemonicError> {
+        // This may be an overestimate if there is any whitespace
+        let mut b = Vec::with_capacity(from.len() / 2);
+        let mut modulus = 0;
+        let mut buf = 0;
+
+        for (idx, byte) in from.bytes().enumerate() {
+            buf <<= 4;
+
+            match byte {
+                b'A'...b'F' => buf |= byte - b'A' + 10,
+                b'a'...b'f' => buf |= byte - b'a' + 10,
+                b'0'...b'9' => buf |= byte - b'0',
+                b' ' | b'\r' | b'\n' | b'\t' => {
+                    buf >>= 4;
+                    continue;
+                }
+                _ => return Err(InvalidHexCharacter(from.clone(), idx)),
+            }
+
+            modulus += 1;
+            if modulus == 2 {
+                modulus = 0;
+                b.push(buf);
+            }
+        }
+
+        match modulus {
+            0 => Ok(b.into_iter().collect()),
+            _ => Err(InvalidHexLength),
+        }
+    }
 }
 
 impl fmt::Debug for Mnemonic {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Generated: \n random characters: {:?} \n mnemonic: ", String::from_utf8_lossy(&self.mnemonic[..self.mnemonic.len()-1]))
+    }
+}
+
+#[derive(Debug)]
+pub enum MnemonicError {
+    Serde(serde_json::Error),
+    Io(ioErr),
+    InvalidHexLength,
+    InvalidHexCharacter(String, usize),
+}
+
+impl From<ioErr> for MnemonicError {
+    fn from(err: ioErr) -> MnemonicError {
+        MnemonicError::Io(err)
+    }
+}
+
+impl From<serde_json::Error> for MnemonicError {
+    fn from(err: serde_json::Error) -> MnemonicError {
+        MnemonicError::Serde(err)
+    }
+}
+
+impl fmt::Display for MnemonicError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Io(ref err) => write!(f, "IO error: {}", err),
+            Serde(ref err) => write!(f, "Serde serialize error: {}", err),
+            InvalidHexCharacter(ref string, idx) => {
+                write!(f, "Invalid character in '{}' at position {}", string, idx)
+            }
+            InvalidHexLength => write!(f, "Invalid input length"),
+        }
+    }
+}
+
+impl Error for MnemonicError {
+    fn description(&self) -> &str {
+        match *self {
+            Io(ref err) => err.description(),
+            Serde(ref err) => err.description(),
+            InvalidHexCharacter(_, _) => "invalid character",
+            InvalidHexLength => "invalid length",
+        }
     }
 }
