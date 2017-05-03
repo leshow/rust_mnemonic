@@ -13,46 +13,40 @@ use std::path::Path;
 static LENGTH: usize = 32;
 
 pub struct MnemonicBuilder<'a> {
-    pub wordslist: Vec<String>,
+    pub words_list: Vec<String>,
     seed: &'a str,
     bit_length: usize,
 }
 
 impl<'a> MnemonicBuilder<'a> {
     pub fn new() -> Result<MnemonicBuilder<'a>, Error> {
-        let str_seed: &str = "seed";
+        let seed: &str = "seed";
         let path = Path::new("src/wordslist/english.txt");
         let mut string_from_file = String::new();
 
         File::open(&path)?
             .read_to_string(&mut string_from_file)?;
 
-        let words: Vec<String> = string_from_file
+        let words_list: Vec<String> = string_from_file
             .split_whitespace()
             .map(|s| s.into())
             .collect();
 
         Ok(
             MnemonicBuilder {
-                seed: str_seed,
-                wordslist: words,
+                seed,
+                words_list,
                 bit_length: LENGTH,
             },
         )
     }
 
-    pub fn with_seed(self, new_seed: &'a str) -> MnemonicBuilder<'a> {
-        MnemonicBuilder {
-            seed: new_seed,
-            ..self
-        }
+    pub fn with_seed(self, seed: &'a str) -> MnemonicBuilder<'a> {
+        MnemonicBuilder { seed, ..self }
     }
 
-    pub fn with_words(self, new_wordslist: Vec<String>) -> MnemonicBuilder<'a> {
-        MnemonicBuilder {
-            wordslist: new_wordslist,
-            ..self
-        }
+    pub fn with_words(self, words_list: Vec<String>) -> MnemonicBuilder<'a> {
+        MnemonicBuilder { words_list, ..self }
     }
 
     pub fn create(&self) -> Result<Mnemonic, Error> {

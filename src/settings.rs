@@ -28,11 +28,11 @@ impl RuntimeSettings {
             Err(f) => panic!(f.to_string()),
         };
 
-        let prog = String::from_str("mnemonic").unwrap();
+        let program = String::from_str("mnemonic").unwrap();
 
         RuntimeSettings {
             print_help: matches.opt_present("h"),
-            program: prog,
+            program,
             seed: matches.opt_str("s"),
             mode: Mode::Default,
         }

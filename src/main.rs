@@ -20,5 +20,5 @@ fn main() {
 
     let mnemonic: Mnemonic = builder.create().expect("Cannot create mnemonic.");
     println!("{:?}", mnemonic);
-    println!("{}", mnemonic.to_words(&builder.wordslist).join(" "));
+    println!("{}", mnemonic.to_words(&builder.words_list).join(" "));
 }
