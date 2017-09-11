@@ -16,7 +16,6 @@ pub enum Mode {
 
 impl RuntimeSettings {
     pub fn new(args: Args) -> RuntimeSettings {
-
         let mut opts = Options::new();
 
         opts.optflag("h", "help", "prints this help menu");

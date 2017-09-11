@@ -28,8 +28,9 @@ impl Mnemonic {
     pub fn new(chars: &str) -> Mnemonic {
         let h = Mnemonic::from_hex(Mnemonic::gen_sha256(chars)).unwrap();
         let length = chars.len() / 32;
-
-        Mnemonic { mnemonic: [chars.as_ref(), &h[..length]].concat() }
+        Mnemonic {
+            mnemonic: [chars.as_ref(), &h[..length]].concat(),
+        }
     }
 
     pub fn to_seed(&self, mnemonic: &str, seed_value: &str) -> Vec<u8> {
@@ -60,7 +61,9 @@ impl Mnemonic {
 
     pub fn to_json(&self, wordslist: &[String]) -> Result<String, MnemonicError> {
         let words = self.to_words(wordslist).join(" ");
-        Ok(serde_json::to_string(&MnemonicResponse { passphrase: &words })?,)
+        Ok(serde_json::to_string(
+            &MnemonicResponse { passphrase: &words },
+        )?)
     }
 
     fn gen_sha256(hashme: &str) -> String {
@@ -106,7 +109,8 @@ impl Mnemonic {
 
 impl fmt::Debug for Mnemonic {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Generated: \n random characters: {:?} \n mnemonic: ", String::from_utf8_lossy(&self.mnemonic[..self.mnemonic.len()-1]))
+        write!(f, "Generated: \n random characters: {:?} \n mnemonic: ",
+        String::from_utf8_lossy(&self.mnemonic[..self.mnemonic.len()-1]))
     }
 }
 
