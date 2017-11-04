@@ -1,5 +1,4 @@
 [package]
-
 name = "rust_mnemonic"
 version = "0.3.0"
 authors = [ "Evan Cameron <cameron.evan@gmail.com>" ]
@@ -9,7 +8,8 @@ repository = "https://github.com/leshow/rust_mnemonic/"
 readme = "README.md"
 
 [[bin]]
-name = "main"
+name = "rmnemonic"
+path = "src/main.rs"
 
 [lib]
 name = "lib"
