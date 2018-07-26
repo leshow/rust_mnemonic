@@ -1,3 +1,5 @@
+cargo-features = ["edition"]
+
 [package]
 name = "rust_mnemonic"
 version = "0.3.0"
@@ -6,6 +8,7 @@ license = "MIT/Apache-2.0"
 homepage = "https://github.com/leshow/rust_mnemonic/"
 repository = "https://github.com/leshow/rust_mnemonic/"
 readme = "README.md"
+edition = "2018"
 
 [[bin]]
 name = "rmnemonic"
@@ -16,7 +19,7 @@ name = "lib"
 path = "src/lib.rs"
 
 [dependencies]
-getopts = "*"
+getopts = "0.2"
 serde = "1.0.0"
 serde_derive = "1.0.0"
 serde_json = "1.0.0"

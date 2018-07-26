@@ -1,8 +1,11 @@
 #![allow(dead_code)]
 use {
-    mnemonic::Mnemonic, rand::{OsRng, Rng},
+    crate::mnemonic::Mnemonic,
+    rand::{OsRng, Rng},
     std::{
-        fs::File, io::{Error, Read}, path::Path,
+        fs::File,
+        io::{Error, Read},
+        path::Path,
     },
 };
 
@@ -14,7 +17,7 @@ pub struct MnemonicBuilder<'a> {
     bit_length: usize,
 }
 
-impl<'a> MnemonicBuilder<'a> {
+impl MnemonicBuilder<'a> {
     pub fn new() -> Result<MnemonicBuilder<'a>, Error> {
         let seed: &str = "seed";
         let path = Path::new("src/wordslist/english.txt");

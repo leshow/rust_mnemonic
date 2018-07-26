@@ -1,6 +1,5 @@
-extern crate getopts;
-
-extern crate lib;
+#![feature(rust_2018_preview)]
+#![warn(rust_2018_idioms)]
 
 use {
     lib::{mnemonic::Mnemonic, mnemonicbuilder::MnemonicBuilder, settings::RuntimeSettings},

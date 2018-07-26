@@ -1,8 +1,12 @@
 pub use self::MnemonicError::*;
 use {
-    nom::IResult, ring::{
-        digest::{self, Digest}, pbkdf2,
-    }, serde_json,
+    nom::*,
+    ring::{
+        digest::{self, Digest},
+        pbkdf2,
+    },
+    serde_derive::Serialize,
+    serde_json,
     std::{error::Error, fmt, io::Error as ioErr},
 };
 
@@ -57,7 +61,7 @@ impl Mnemonic {
     // Some explanation is necessary.. This uses nom's combinator macros to create
     // a function that makes a parser specifically for grabbing bits 11 at
     // a time, dumping in a u16
-    pub fn to_words<'a>(&'a self, wordslist: &'a [String]) -> Vec<&str> {
+    pub fn to_words(&self, wordslist: &'a [String]) -> Vec<&'a str> {
         named!(bit_vec<Vec<u16>>, bits!(many0!(take_bits!(u16, 11))));
 
         let mut mnem_words = Vec::new();
