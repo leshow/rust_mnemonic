@@ -1,8 +1,9 @@
-#![warn(rust_2018_idioms)]
+mod mnemonic;
+mod mnemonicbuilder;
+mod settings;
 
-mod lib;
 use {
-    crate::lib::{mnemonic::Mnemonic, mnemonicbuilder::MnemonicBuilder, settings::RuntimeSettings},
+    crate::{mnemonic::Mnemonic, mnemonicbuilder::MnemonicBuilder, settings::RuntimeSettings},
     std::env,
 };
 
