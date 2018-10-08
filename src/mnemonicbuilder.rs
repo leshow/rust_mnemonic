@@ -17,7 +17,7 @@ pub struct MnemonicBuilder<'a> {
     bit_length: usize,
 }
 
-impl MnemonicBuilder<'a> {
+impl<'a> MnemonicBuilder<'a> {
     pub fn new() -> Result<MnemonicBuilder<'a>, Error> {
         let seed: &str = "seed";
         let path = Path::new("src/wordslist/english.txt");

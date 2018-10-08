@@ -61,7 +61,7 @@ impl Mnemonic {
     // Some explanation is necessary.. This uses nom's combinator macros to create
     // a function that makes a parser specifically for grabbing bits 11 at
     // a time, dumping in a u16
-    pub fn to_words(&self, wordslist: &'a [String]) -> Vec<&'a str> {
+    pub fn to_words<'a>(&self, wordslist: &'a [String]) -> Vec<&'a str> {
         named!(bit_vec<Vec<u16>>, bits!(many0!(take_bits!(u16, 11))));
 
         let mut mnem_words = Vec::new();
