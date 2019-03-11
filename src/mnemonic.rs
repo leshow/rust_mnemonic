@@ -1,16 +1,16 @@
 pub use self::MnemonicError::*;
 use {
-    nom::*,
+    nom::IResult,
     ring::{
         digest::{self, Digest},
         pbkdf2,
     },
     serde_derive::Serialize,
     serde_json,
-    std::{error::Error, fmt, io::Error as ioErr},
+    std::{error::Error, fmt, io::Error as ioErr, num::NonZeroU32},
 };
 
-static PBKDF2_ROUNDS: u32 = 2048;
+pub const LENGTH: usize = 32;
 static PBKDF2_KEY_LEN: usize = 64;
 
 #[derive(Serialize)]
@@ -20,6 +20,7 @@ struct MnemonicResponse<'a> {
 
 pub struct Mnemonic {
     pub mnemonic: Vec<u8>,
+    pub pbkdf2_rounds: NonZeroU32,
 }
 
 static DIGEST_ALG: &digest::Algorithm = &digest::SHA512;
@@ -28,8 +29,11 @@ impl Mnemonic {
     pub fn new<S: AsRef<str>>(chars: S) -> Mnemonic {
         let h = Mnemonic::gen_sha256(chars.as_ref());
         let length = chars.as_ref().len() / 32;
+        let pbkdf2_rounds = NonZeroU32::new(2045).unwrap();
+
         Mnemonic {
             mnemonic: [chars.as_ref().as_bytes(), &h.as_ref()[..length]].concat(),
+            pbkdf2_rounds,
         }
     }
 
@@ -42,7 +46,7 @@ impl Mnemonic {
         let mut result = vec![0u8; PBKDF2_KEY_LEN];
         pbkdf2::derive(
             DIGEST_ALG,
-            PBKDF2_ROUNDS,
+            self.pbkdf2_rounds,
             &salt,
             mnemonic.as_ref().as_bytes(),
             &mut result,

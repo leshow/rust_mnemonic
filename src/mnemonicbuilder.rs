@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use {
     crate::mnemonic::Mnemonic,
-    rand::{OsRng, Rng},
+    rand::{distributions::Alphanumeric, rngs::OsRng, Rng},
     std::{
         fs::File,
         io::{Error, Read},
@@ -9,12 +9,9 @@ use {
     },
 };
 
-static LENGTH: usize = 32;
-
 pub struct MnemonicBuilder<'a> {
     pub words_list: Vec<String>,
     seed: &'a str,
-    bit_length: usize,
 }
 
 impl<'a> MnemonicBuilder<'a> {
@@ -30,11 +27,7 @@ impl<'a> MnemonicBuilder<'a> {
             .map(|s| s.into())
             .collect();
 
-        Ok(MnemonicBuilder {
-            seed,
-            words_list,
-            bit_length: LENGTH,
-        })
+        Ok(MnemonicBuilder { seed, words_list })
     }
 
     pub fn with_seed(self, seed: &'a str) -> MnemonicBuilder<'a> {
@@ -47,8 +40,8 @@ impl<'a> MnemonicBuilder<'a> {
 
     pub fn create(&self) -> Result<Mnemonic, Error> {
         let random_chars: String = OsRng::new()?
-            .gen_ascii_chars()
-            .take(self.bit_length)
+            .sample_iter(&Alphanumeric)
+            .take(crate::mnemonic::LENGTH)
             .collect();
 
         Ok(Mnemonic::new(&random_chars))

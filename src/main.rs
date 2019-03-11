@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate nom;
+
 mod mnemonic;
 mod mnemonicbuilder;
 mod settings;
