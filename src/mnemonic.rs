@@ -1,6 +1,10 @@
 pub use self::MnemonicError::*;
+
 use {
-    nom::IResult,
+    nom::{
+        bits::{bits, complete::take},
+        bytes, IResult,
+    },
     ring::{
         digest::{self, Digest},
         pbkdf2,
@@ -24,6 +28,10 @@ pub struct Mnemonic {
 }
 
 static DIGEST_ALG: &digest::Algorithm = &digest::SHA512;
+
+// fn take_11_bits(input: &[u16]) -> IResult<&[u16], u64> {
+//     bits(take(11usize))(input)
+// }
 
 impl Mnemonic {
     pub fn new<S: AsRef<str>>(chars: S) -> Mnemonic {
@@ -66,14 +74,52 @@ impl Mnemonic {
     // a function that makes a parser specifically for grabbing bits 11 at
     // a time, dumping in a u16
     pub fn to_words<'a>(&self, wordslist: &'a [String]) -> Vec<&'a str> {
-        named!(bit_vec<Vec<u16>>, bits!(many0!(take_bits!(u16, 11))));
-
         let mut mnem_words = Vec::new();
-        if let IResult::Done(_, bit_sequence) = bit_vec(self.mnemonic.as_slice()) {
-            for idx in &bit_sequence {
-                mnem_words.push(wordslist[*idx as usize].as_ref());
+
+        let bytes: &[u16] = unsafe {
+            std::slice::from_raw_parts(
+                self.mnemonic.as_ptr() as *const u16,
+                self.mnemonic.len() / 2,
+            )
+        };
+        let rmask: u16 = ((1 << 11) - 1) as u16;
+        let lmask: u16 = (-1i16 << 11) as u16;
+        let mut i = 0;
+        let mut left = 0;
+        let mut right;
+        let mut llen;
+        let mut rlen;
+        while i < bytes.len() {
+            if i == 0 {
+                right = rmask & bytes[i];
+                rlen = 11;
+                left = lmask & bytes[i];
+                llen = 5;
+                mnem_words.push(wordslist[right as usize].as_ref());
+            } else {
+                right = rmask & bytes[i];
+                let idx = (left << 11) | right;
+                println!("left - {:b}", left << 11);
+
+                println!("right - {:b}", right);
+                println!("full - {:b}", idx);
+                mnem_words.push(wordslist[idx as usize].as_ref());
+                left = lmask & bytes[i]; // save for next iteration
             }
+            i += 1;
         }
+
+        // if let Ok((bit_sequence, _)) = take_11_bits(mnem_bytes) {
+        //     for idx in bit_sequence {
+        //         dbg!(wordslist[*idx as usize]);
+        //         mnem_words.push(wordslist[*idx as usize].as_ref());
+        //     }
+        // }
+        // if let IResult::Done(_, bit_sequence) = bit_vec(self.mnemonic.as_slice()) {
+        //     for idx in &bit_sequence {
+        //         mnem_words.push(wordslist[*idx as usize].as_ref());
+        //     }
+        // }
 
         mnem_words
     }
