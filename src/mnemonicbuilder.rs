@@ -1,10 +1,11 @@
 #![allow(dead_code)]
 use {
     crate::mnemonic::Mnemonic,
-    rand::{distributions::Alphanumeric, rngs::OsRng, Rng},
+    rand::{distributions::Alphanumeric, thread_rng, Rng},
     std::{
         fs::File,
         io::{Error, Read},
+        iter,
         path::Path,
     },
 };
@@ -39,8 +40,8 @@ impl<'a> MnemonicBuilder<'a> {
     }
 
     pub fn create(&self) -> Result<Mnemonic, Error> {
-        let random_chars: String = OsRng::new()?
-            .sample_iter(&Alphanumeric)
+        let random_chars: String = iter::repeat(())
+            .map(|_| thread_rng().sample(Alphanumeric))
             .take(crate::mnemonic::LENGTH)
             .collect();
 

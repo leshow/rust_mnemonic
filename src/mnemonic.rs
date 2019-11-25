@@ -1,6 +1,7 @@
 pub use self::MnemonicError::*;
 
 use {
+    bitvec::prelude::*,
     nom::{
         bits::{bits, complete::take},
         bytes, IResult,
@@ -11,7 +12,7 @@ use {
     },
     serde_derive::Serialize,
     serde_json,
-    std::{error::Error, fmt, io::Error as ioErr, num::NonZeroU32},
+    std::{error::Error, fmt, io::Error as ioErr, num::NonZeroU32, ptr},
 };
 
 pub const LENGTH: usize = 32;
@@ -74,39 +75,34 @@ impl Mnemonic {
     // a function that makes a parser specifically for grabbing bits 11 at
     // a time, dumping in a u16
     pub fn to_words<'a>(&self, wordslist: &'a [String]) -> Vec<&'a str> {
+        use std::slice;
         let mut mnem_words = Vec::new();
 
-        let bytes: &[u16] = unsafe {
-            std::slice::from_raw_parts(
-                self.mnemonic.as_ptr() as *const u16,
-                self.mnemonic.len() / 2,
-            )
-        };
-        let rmask: u16 = ((1 << 11) - 1) as u16;
-        let lmask: u16 = (-1i16 << 11) as u16;
-        let mut i = 0;
-        let mut left = 0;
-        let mut right;
-        let mut llen;
-        let mut rlen;
-        while i < bytes.len() {
-            if i == 0 {
-                right = rmask & bytes[i];
-                rlen = 11;
-                left = lmask & bytes[i];
-                llen = 5;
-                mnem_words.push(wordslist[right as usize].as_ref());
-            } else {
-                right = rmask & bytes[i];
-                let idx = (left << 11) | right;
-                println!("left - {:b}", left << 11);
+        // let bytes: &[u16] = unsafe {
+        //     std::slice::from_raw_parts(
+        //         self.mnemonic.as_ptr() as *const u16,
+        //         self.mnemonic.len() / 2,
+        //     )
+        // };
+        println!("{:?}", self.mnemonic);
+        let bytes = self.mnemonic.as_ptr();
 
-                println!("right - {:b}", right);
-                println!("full - {:b}", idx);
-                mnem_words.push(wordslist[idx as usize].as_ref());
-                left = lmask & bytes[i]; // save for next iteration
-            }
-            i += 1;
+        let mut byte = 0b0;
+        let mut word_idx: u16 = 0;
+        let mut i = 11;
+        while i < self.mnemonic.len() * 8 {
+            let byte_idx = i / 8;
+            let cur_bit = i - (i / 8) * 8;
+            let smask = (1 << cur_bit) - 1;
+            let fmask = 1u8.overflowing_shl((11 - cur_bit) as u32).0 - 1;
+            println!("byte {} bit {} {:b} {:b}", byte_idx, cur_bit, smask, fmask);
+
+            let fst = self.mnemonic[byte_idx - 1] & fmask;
+            let snd = self.mnemonic[byte_idx] & smask;
+            let total = u16::from_le_bytes([fst, snd.to_be()]);
+            println!("{:b} {:b} total {:b} {}", fst, snd, total, total);
+
+            i += 11;
         }
 
         // if let Ok((bit_sequence, _)) = take_11_bits(mnem_bytes) {
