@@ -2,12 +2,6 @@
 
 # rust mnemonic (BIP-39)
 
-Note: compiles w/ rust edition 2018 currently (testing it out)
-
-Evan Cameron <mailto:cameron.evan@gmail.com>
-
-Crypto leveraged from ringlibrary: ( https://github.com/briansmith/ring )
-
 mnemonic generation and key derivation follows [BIP-0039](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki).
 
 to get started, simply:
@@ -23,14 +17,6 @@ cargo install
 
 Install will provide you with the `rust_mnemonic` binary
 
-run with:
-
-```bash
-./target/main
-
-# help
-./target/main --help
-```
 
 If no seed is provided the seed string will be "seed". The seed string will be used in conjunction with the mnemonic for generating the pbkdf2 key.
 
